@@ -4,7 +4,7 @@ plugins {
 	id 'java'
 }
 
-group = 'com.book.microservices.core.review'
+group = 'com.book.microservices.core.recommendation'
 version = '1.0.0-SNAPSHOT'
 sourceCompatibility = '14'
 
@@ -12,7 +12,8 @@ repositories {
 	mavenCentral()
 }
 
-dependencies {	implementation project(':api')
+dependencies {
+	implementation project(':api')
 	implementation project(':util')
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
