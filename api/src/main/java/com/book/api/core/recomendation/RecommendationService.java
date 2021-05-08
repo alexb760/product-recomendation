@@ -22,7 +22,7 @@ public interface RecommendationService {
    * @param productId product identifier
    * @return List of {@link Recomendation}
    */
-  @GetMapping(value = "/recomendation", produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "/recommendation", produces = MediaType.APPLICATION_JSON_VALUE)
   List<Recomendation> getRecommendations(
       @RequestParam(value = "productId", required = true) int productId);
 }

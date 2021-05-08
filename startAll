@@ -1,4 +1,4 @@
 java -jar services/product-composite-service/build/libs/*.jar &
 java -jar services/product-service/build/libs/*.jar &
-java -jar services/recommendation-service/build/libs/*.jar &
+java -jar services/recomendation-service/build/libs/*.jar &
 java -jar services/review-service/build/libs/*.jar &
