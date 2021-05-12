@@ -1,5 +1,10 @@
 version: "3"
+# common commands:
 
+# docker system prune -f --volumes
+# Restart a container or scale
+#docker-compose up -d --scale product=0
+#docker-compose up -d --scale product=1
 services:
   product:
     build: services/product-service
