@@ -5,3 +5,7 @@ logging:
   level:
     root: INFO
     com.book: DEBUG
+
+---
+spring.profiles: docker
+server.port: 8080

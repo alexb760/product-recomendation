@@ -4,3 +4,11 @@ logging:
   level:
     root: INFO
     com.book.microservices: DEBUG
+
+# When we use yml we can separate different profile by adding
+# `---`
+# that means when we run our application with profile 'docker' it will overwrite previous one
+# server.port: 7001
+---
+spring.profiles: docker
+server.port: 8080

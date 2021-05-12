@@ -1,0 +1,40 @@
+version: "3"
+
+services:
+  product:
+    build: services/product-service
+    mem_limit: 350m
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - microservices
+
+  recommendation:
+    build: services/recomendation-service
+    mem_limit: 350m
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - microservices
+
+  review:
+    build: services/review-service
+    mem_limit: 350m
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - microservices
+
+  product-composite:
+    build: services/product-composite-service
+    mem_limit: 350m
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - microservices
+
+networks:
+  microservices:
+    driver: bridge
