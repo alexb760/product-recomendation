@@ -9,18 +9,20 @@
 package com.book.api.core.recomendation;
 
 import lombok.Getter;
+import lombok.Setter;
 
 /** @author Alexander Bravo */
 @Getter
-public class Recomendation {
-  private final int productId;
-  private final int recommendationId;
-  private final String author;
-  private final int rate;
-  private final String content;
-  private final String serviceAddress;
+@Setter
+public class Recommendation {
+  private int productId;
+  private int recommendationId;
+  private String author;
+  private int rate;
+  private String content;
+  private String serviceAddress;
 
-  public Recomendation() {
+  public Recommendation() {
     productId = 0;
     recommendationId = 0;
     author = null;
@@ -29,7 +31,7 @@ public class Recomendation {
     serviceAddress = null;
   }
 
-  public Recomendation(
+  public Recommendation(
       int productId,
       int recommendationId,
       String author,

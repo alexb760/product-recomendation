@@ -1,9 +1,17 @@
 server.port: 7001
+server.error.include-message: always
+
+
+spring.data.mongodb:
+  host: localhost
+  port: 27017
+  database: product-db
 
 logging:
   level:
     root: INFO
     com.book.microservices: DEBUG
+    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
 
 # When we use yml we can separate different profile by adding
 # `---`

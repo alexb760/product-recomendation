@@ -6,7 +6,7 @@ import com.book.api.composite.product.RecommendationSummary;
 import com.book.api.composite.product.ReviewSummary;
 import com.book.api.composite.product.ServiceAddresses;
 import com.book.api.core.product.Product;
-import com.book.api.core.recomendation.Recomendation;
+import com.book.api.core.recomendation.Recommendation;
 import com.book.api.core.review.Review;
 import com.book.util.exception.NotFoundException;
 import com.book.util.http.ServiceUtil;
@@ -35,7 +35,7 @@ public class ProductCompositeServiceImpl implements ProductCompositeService {
     if (product == null)
       throw new NotFoundException("No product found for productId: " + productId);
 
-    List<Recomendation> recommendations = integration.getRecommendations(productId);
+    List<Recommendation> recommendations = integration.getRecommendations(productId);
 
     List<Review> reviews = integration.getReviews(productId);
 
@@ -45,7 +45,7 @@ public class ProductCompositeServiceImpl implements ProductCompositeService {
 
   private ProductAggregate createProductAggregate(
       Product product,
-      List<Recomendation> recommendations,
+      List<Recommendation> recommendations,
       List<Review> reviews,
       String serviceAddress) {
 

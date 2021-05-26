@@ -3,7 +3,7 @@ package com.book.microservices.composite.product.services;
 import static org.springframework.http.HttpMethod.GET;
 import com.book.api.core.product.Product;
 import com.book.api.core.product.ProductService;
-import com.book.api.core.recomendation.Recomendation;
+import com.book.api.core.recomendation.Recommendation;
 import com.book.api.core.recomendation.RecommendationService;
 import com.book.api.core.review.Review;
 import com.book.api.core.review.ReviewService;
@@ -61,7 +61,7 @@ public class ProductCompositeIntegration
   }
 
   @Override
-  public Product getProduct(int productId) {
+  public Product getProductFake(int productId) {
     try {
       String url = productServiceUrl + productId;
       log.debug("Will call getProduct API on URL: {}", url);
@@ -84,7 +84,22 @@ public class ProductCompositeIntegration
     }
   }
 
-  private String getErrorMessage(HttpClientErrorException ex) {
+    @Override
+    public Product createProduct(Product body) {
+        return null;
+    }
+
+    @Override
+    public Product getProduct(int productId) {
+        return null;
+    }
+
+    @Override
+    public void deleteProduct(int productId) {
+
+    }
+
+    private String getErrorMessage(HttpClientErrorException ex) {
     try {
         return mapper.readValue(ex.getResponseBodyAsString(), HttpErrorInfo.class).getMessage();
     } catch (IOException ioex) {
@@ -92,14 +107,19 @@ public class ProductCompositeIntegration
     }
     }
 
-  @Override
-  public List<Recomendation> getRecommendations(int productId) {
+    @Override
+    public Recommendation createRecommendation(Recommendation body) {
+        return null;
+    }
+
+    @Override
+  public List<Recommendation> getRecommendations(int productId) {
       try {
           String url = recommendationServiceUrl + productId;
           log.debug("Will call getRecommendations API on URL: {}", url);
-          List<Recomendation> recommendations =
+          List<Recommendation> recommendations =
               restTemplate
-                  .exchange(url, GET, null, new ParameterizedTypeReference<List<Recomendation>>() {})
+                  .exchange(url, GET, null, new ParameterizedTypeReference<List<Recommendation>>() {})
                   .getBody();
 
           log.debug("Found {} recommendations for a product with id: {}", recommendations.size(), productId);
@@ -111,7 +131,17 @@ public class ProductCompositeIntegration
       }
   }
 
-  @Override
+    @Override
+    public void deleteRecommendations(int productId) {
+
+    }
+
+    @Override
+    public Review createReview(Review body) {
+        return null;
+    }
+
+    @Override
   public List<Review> getReviews(int productId) {
       try {
           String url = reviewServiceUrl + productId;
@@ -130,4 +160,9 @@ public class ProductCompositeIntegration
           return List.of();
       }
   }
+
+    @Override
+    public void deleteReviews(int productId) {
+
+    }
 }

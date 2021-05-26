@@ -2,11 +2,12 @@ package com.book.microservices.composite.product.services;
 
 import static java.util.Collections.singletonList;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import com.book.api.core.product.Product;
-import com.book.api.core.recomendation.Recomendation;
+import com.book.api.core.recomendation.Recommendation;
 import com.book.api.core.review.Review;
 import com.book.util.exception.InvalidInputException;
 import com.book.util.exception.NotFoundException;
@@ -21,8 +22,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 /** @author Alexander Bravo */
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-// @WebMvcTest(ProductCompositeServiceImpl.class)
+@SpringBootTest(webEnvironment = RANDOM_PORT, properties = {"spring.data.mongodb.port: 0"})
 public class ProductCompositeServiceApplicationTests {
 
   private static final int PRODUCT_ID_OK = 1;
@@ -43,7 +43,7 @@ public class ProductCompositeServiceApplicationTests {
     given(compositeIntegration.getRecommendations(PRODUCT_ID_OK))
         .willReturn(
             singletonList(
-                new Recomendation(PRODUCT_ID_OK, 1, "author", 1, "content", "mock address")));
+                new Recommendation(PRODUCT_ID_OK, 1, "author", 1, "content", "mock address")));
     given(compositeIntegration.getReviews(PRODUCT_ID_OK))
         .willReturn(
             singletonList(

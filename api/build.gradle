@@ -4,6 +4,7 @@ buildscript {
 	}
 	repositories {
 		mavenCentral()
+		maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local/' }
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
@@ -31,6 +32,14 @@ dependencies {
 	implementation('org.springframework.boot:spring-boot-starter-webflux')
 	compileOnly 'org.projectlombok:lombok:1.18.20'
 	annotationProcessor 'org.projectlombok:lombok:1.18.20'
+	implementation('io.springfox:springfox-swagger2:3.0.0')
+	//Implementation of openAPI with springFox
+	//Implements documentation for the annotated interface
+//	implementation('io.springfox:springfox-swagger2:3.0.1-SNAPSHOT')
+	//Enables UI
+//	implementation('io.springfox:springfox-swagger-ui:3.0.1-SNAPSHOT')
+	// Enables reactive support
+//	implementation('io.springfox:springfox-spring-webflux:3.0.1-SNAPSHOT')
 
 	testCompileOnly 'org.projectlombok:lombok:1.18.20'
 	testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
