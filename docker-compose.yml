@@ -13,6 +13,8 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
       - microservices
+    depends_on:
+      - mongodb
 
   recommendation:
     build: services/recomendation-service
@@ -21,6 +23,8 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
       - microservices
+    depends_on:
+      - mongodb
 
   review:
     build: services/review-service
@@ -29,14 +33,48 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
       - microservices
+    depends_on:
+      mysql:
+        condition: service_healthy
 
   product-composite:
     build: services/product-composite-service
     mem_limit: 350m
     ports:
       - "8080:8080"
+#      - "5005:5005"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+#      - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+    networks:
+      - microservices
+
+  # $ mongo
+  mongodb:
+    image: mongo
+    mem_limit: 350m
+    ports:
+      - "27017:27017"
+#    command: mongod --smallfiles
+    networks:
+      - microservices
+
+  # $ mysql -uroot -h127.0.0.1 -p
+  mysql:
+    image: mysql:5.7
+    mem_limit: 350m
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpwd
+      - MYSQL_DATABASE=review-db
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=pwd
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-uuser", "-ppwd", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     networks:
       - microservices
 

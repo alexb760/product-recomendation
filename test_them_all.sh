@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 #
+# ./grdelw clean build
+# docker-compose build
+# docker-compose up -d
+#
 # Sample usage:
 #
 #   HOST=localhost PORT=8080 ./test_them_all.sh
@@ -46,7 +50,10 @@ function assertEqual() {
 }
 function testUrl() {
     url=$@
-    if curl $url -ks -f -o /dev/null
+    response=$(curl --write-out %{http_code} --silent --output /dev/null $url)
+    echo " testUrl: $response"
+#    if curl $url -ks -f -o /dev/null
+    if [ "$response" -eq "200" ]
     then
           echo "Ok"
           return 0
@@ -74,6 +81,46 @@ function waitForService() {
     done
 }
 
+function recreateComposite() {
+    local productId=$1
+    local composite=$2
+
+    assertCurl 200 "curl -X DELETE http://$HOST:$PORT/product-composite/${productId} -s"
+    curl -X POST http://$HOST:$PORT/product-composite -H "Content-Type: application/json" --data "$composite"
+}
+
+function setupTestdata() {
+
+    body=\
+'{"productId":1,"name":"product 1","weight":1, "recommendations":[
+        {"recommendationId":1,"author":"author 1","rate":1,"content":"content 1"},
+        {"recommendationId":2,"author":"author 2","rate":2,"content":"content 2"},
+        {"recommendationId":3,"author":"author 3","rate":3,"content":"content 3"}
+    ], "reviews":[
+        {"reviewId":1,"author":"author 1","subject":"subject 1","content":"content 1"},
+        {"reviewId":2,"author":"author 2","subject":"subject 2","content":"content 2"},
+        {"reviewId":3,"author":"author 3","subject":"subject 3","content":"content 3"}
+    ]}'
+    recreateComposite 1 "$body"
+
+    body=\
+'{"productId":113,"name":"product 113","weight":113, "reviews":[
+    {"reviewId":1,"author":"author 1","subject":"subject 1","content":"content 1"},
+    {"reviewId":2,"author":"author 2","subject":"subject 2","content":"content 2"},
+    {"reviewId":3,"author":"author 3","subject":"subject 3","content":"content 3"}
+]}'
+    recreateComposite 113 "$body"
+
+    body=\
+'{"productId":213,"name":"product 213","weight":213, "recommendations":[
+    {"recommendationId":1,"author":"author 1","rate":1,"content":"content 1"},
+    {"recommendationId":2,"author":"author 2","rate":2,"content":"content 2"},
+    {"recommendationId":3,"author":"author 3","rate":3,"content":"content 3"}
+]}'
+    recreateComposite 213 "$body"
+
+}
+
 set -e
 
 echo "start: " `date`
@@ -90,7 +137,9 @@ then
     docker-compose up -d
 fi
 
-waitForService http://$HOST:$PORT/product-composite/1
+waitForService -X DELETE http://$HOST:$PORT/product-composite/13
+
+setupTestdata
 
 # Verify that a normal request works, expect three recommendations and three reviews
 assertCurl 200 "curl http://$HOST:$PORT/product-composite/1 -s"
@@ -117,9 +166,8 @@ assertCurl 422 "curl http://$HOST:$PORT/product-composite/-1 -s"
 assertEqual "\"Invalid productId: -1\"" "$(echo $RESPONSE | jq .message)"
 
 # Verify that a 400 (Bad Request) error error is returned for a productId that is not a number, i.e. invalid format
-#assertCurl 400 "curl http://$HOST:$PORT/product-composite/invalidProductId -s"
-#assertEqual "\"Type mismatch.\"" "$(echo $RESPONSE | jq .message)"
-
+assertCurl 400 "curl http://$HOST:$PORT/product-composite/invalidProductId -s"
+assertEqual "\"\"" "$(echo $RESPONSE | jq .message)"
 
 if [[ $@ == *"stop"* ]]
 then

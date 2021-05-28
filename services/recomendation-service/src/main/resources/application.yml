@@ -9,7 +9,8 @@ spring.data.mongodb:
 logging:
   level:
     root: INFO
-    se.magnus: DEBUG
+    com.book.microservices: DEBUG
+    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
 
 ---
 spring.profiles: docker
