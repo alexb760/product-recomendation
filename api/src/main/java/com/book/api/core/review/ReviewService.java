@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import reactor.core.publisher.Flux;
 
 /** @author Alexander Bravo */
 public interface ReviewService {
@@ -39,7 +40,7 @@ public interface ReviewService {
    * @return
    */
   @GetMapping(value = "/review", produces = MediaType.APPLICATION_JSON_VALUE)
-  List<Review> getReviews(@RequestParam(value = "productId", required = true) int productId);
+  Flux<Review> getReviews(@RequestParam(value = "productId", required = true) int productId);
 
   /**
    * Sample usage:

@@ -22,12 +22,17 @@ import org.springframework.util.NumberUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Mono;
 
 /** @author Alexander Bravo */
 @Slf4j
 @Component
 public class ProductCompositeIntegration
     implements ProductService, RecommendationService, ReviewService {
+
+    private final WebClient webClient;
 
     private final RestTemplate restTemplate;
     private final ObjectMapper mapper;
@@ -38,6 +43,7 @@ public class ProductCompositeIntegration
 
     @Autowired
     public ProductCompositeIntegration(
+        WebClient.Builder webClient,
         RestTemplate restTemplate,
         ObjectMapper mapper,
         @Value("${app.product-service.host}") String productServiceHost,
@@ -56,6 +62,8 @@ public class ProductCompositeIntegration
             getFormattedURL(
                 recommendationServiceHost, recommendationServicePort, "recommendation?productId=");
         reviewServiceUrl = getFormattedURL(reviewServiceHost, reviewServicePort, "/review?productId=");
+
+        this.webClient = webClient.build();
     }
 
     private String getFormattedURL(String hostName, int servicePort, String pathAPI) {
@@ -103,20 +111,21 @@ public class ProductCompositeIntegration
     }
 
     @Override
-    public Product getProduct(int productId) {
+    public Mono<Product> getProduct(int productId) {
 
-        try {
             String url = productServiceUrl + "/" + productId;
-            log.debug("Will call the getProduct API on URL: {}", url);
-
-            Product product = restTemplate.getForObject(url, Product.class);
-            log.debug("Found a product with id: {}", product.getProductId());
-
-            return product;
-
-        } catch (HttpClientErrorException ex) {
-            throw handleHttpClientException(ex);
-        }
+//        try {
+//            log.debug("Will call the getProduct API on URL: {}", url);
+//
+//            Product product = restTemplate.getForObject(url, Product.class);
+//            log.debug("Found a product with id: {}", product.getProductId());
+//
+//            return product;
+//
+//        } catch (HttpClientErrorException ex) {
+//            throw handleHttpClientException(ex);
+//        }
+        return webClient.get().uri(url).retrieve().bodyToMono(Product.class).log().onErrorMap(WebClientResponseException.class, ex -> handleException(ex));
     }
 
     @Override
@@ -251,6 +260,38 @@ public class ProductCompositeIntegration
                 log.warn("Got a unexpected HTTP error: {}, will rethrow it", ex.getStatusCode());
                 log.warn("Error body: {}", ex.getResponseBodyAsString());
                 return ex;
+        }
+    }
+
+    private Throwable handleException(Throwable ex) {
+
+        if (!(ex instanceof WebClientResponseException)) {
+            log.warn("Got a unexpected error: {}, will rethrow it", ex.toString());
+            return ex;
+        }
+
+        WebClientResponseException wcre = (WebClientResponseException)ex;
+
+        switch (wcre.getStatusCode()) {
+
+            case NOT_FOUND:
+                return new NotFoundException(getErrorMessage(wcre));
+
+            case UNPROCESSABLE_ENTITY :
+                return new InvalidInputException(getErrorMessage(wcre));
+
+            default:
+                log.warn("Got a unexpected HTTP error: {}, will rethrow it", wcre.getStatusCode());
+                log.warn("Error body: {}", wcre.getResponseBodyAsString());
+                return ex;
+        }
+    }
+
+    private String getErrorMessage(WebClientResponseException ex) {
+        try {
+            return mapper.readValue(ex.getResponseBodyAsString(), HttpErrorInfo.class).getMessage();
+        } catch (IOException ioex) {
+            return ex.getMessage();
         }
     }
 }

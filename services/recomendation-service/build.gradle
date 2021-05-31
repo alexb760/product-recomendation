@@ -23,7 +23,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	compileOnly 'org.projectlombok:lombok:1.18.20'
 	annotationProcessor 'org.projectlombok:lombok:1.18.20'
-	implementation('org.springframework.boot:spring-boot-starter-data-mongodb')
+//	implementation('org.springframework.boot:spring-boot-starter-data-mongodb')
+	implementation('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
 	implementation("org.mapstruct:mapstruct:${mapstructVersion}")
 
 	compileOnly "org.mapstruct:mapstruct-processor:${mapstructVersion}"

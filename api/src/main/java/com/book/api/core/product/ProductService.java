@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import reactor.core.publisher.Mono;
 
 /**
  * @author Alexander Bravo
@@ -47,7 +48,7 @@ public interface ProductService {
  @GetMapping(
      value    = "/product/{productId}",
      produces = "application/json")
- Product getProduct(@PathVariable int productId);
+ Mono<Product> getProduct(@PathVariable int productId);
 
  /**
   * Sample usage:
