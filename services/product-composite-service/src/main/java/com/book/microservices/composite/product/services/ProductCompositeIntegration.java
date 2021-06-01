@@ -1,6 +1,5 @@
 package com.book.microservices.composite.product.services;
 
-import static org.springframework.http.HttpMethod.GET;
 import com.book.api.core.product.Product;
 import com.book.api.core.product.ProductService;
 import com.book.api.core.recomendation.Recommendation;
@@ -12,18 +11,16 @@ import com.book.util.exception.NotFoundException;
 import com.book.util.http.HttpErrorInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.boot.actuate.health.Health;
 import org.springframework.stereotype.Component;
-import org.springframework.util.NumberUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /** @author Alexander Bravo */
@@ -112,20 +109,14 @@ public class ProductCompositeIntegration
 
     @Override
     public Mono<Product> getProduct(int productId) {
-
-            String url = productServiceUrl + "/" + productId;
-//        try {
-//            log.debug("Will call the getProduct API on URL: {}", url);
-//
-//            Product product = restTemplate.getForObject(url, Product.class);
-//            log.debug("Found a product with id: {}", product.getProductId());
-//
-//            return product;
-//
-//        } catch (HttpClientErrorException ex) {
-//            throw handleHttpClientException(ex);
-//        }
-        return webClient.get().uri(url).retrieve().bodyToMono(Product.class).log().onErrorMap(WebClientResponseException.class, ex -> handleException(ex));
+        String url = productServiceUrl + "/" + productId;
+        return webClient
+            .get()
+            .uri(url)
+            .retrieve()
+            .bodyToMono(Product.class)
+            .log()
+            .onErrorMap(WebClientResponseException.class, this::handleException);
     }
 
     @Override
@@ -166,22 +157,15 @@ public class ProductCompositeIntegration
     }
 
     @Override
-    public List<Recommendation> getRecommendations(int productId) {
-        try {
+    public Flux<Recommendation> getRecommendations(int productId) {
             String url = recommendationServiceUrl + productId;
             log.debug("Will call getRecommendations API on URL: {}", url);
-            List<Recommendation> recommendations =
-                restTemplate
-                    .exchange(url, GET, null, new ParameterizedTypeReference<List<Recommendation>>() {})
-                    .getBody();
 
-            log.debug("Found {} recommendations for a product with id: {}", recommendations.size(), productId);
-            return recommendations;
-
-        } catch (Exception ex) {
-            log.warn("Got an exception while requesting recommendations, return zero recommendations: {}", ex.getMessage());
-            return List.of();
-        }
+            return webClient.get().uri(url)
+                .retrieve()
+                .bodyToFlux(Recommendation.class)
+                .log()
+                .onErrorResume(error -> Flux.empty());
     }
 
     @Override
@@ -215,23 +199,41 @@ public class ProductCompositeIntegration
     }
 
     @Override
-    public List<Review> getReviews(int productId) {
-        try {
-            String url = reviewServiceUrl + productId;
+    public Flux<Review> getReviews(int productId) {
+       String url = reviewServiceUrl + productId;
 
-            log.debug("Will call getReviews API on URL: {}", url);
-            List<Review> reviews =
-                restTemplate
-                    .exchange(url, GET, null, new ParameterizedTypeReference<List<Review>>() {})
-                    .getBody();
+       log.debug("Will call getReviews API on URL: {}", url);
+        // Return an empty result if something goes wrong to make it possible for the composite service to return partial responses
+       return webClient.get()
+           .uri(url)
+           .retrieve()
+           .bodyToFlux(Review.class)
+           .log()
+           .onErrorResume(error -> Flux.empty());
+    }
 
-            log.debug("Found {} reviews for a product with id: {}", reviews.size(), productId);
-            return reviews;
+    public Mono<Health> getProductHealth() {
+        return getHealth(productServiceUrl);
+    }
 
-        } catch (Exception ex) {
-            log.warn("Got an exception while requesting reviews, return zero reviews: {}", ex.getMessage());
-            return List.of();
-        }
+    public Mono<Health> getRecommendationHealth() {
+        return getHealth(recommendationServiceUrl);
+    }
+
+    public Mono<Health> getReviewHealth() {
+        return getHealth(reviewServiceUrl);
+    }
+
+    private Mono<Health> getHealth(String url) {
+        url += "/actuator/health";
+        log.debug("Will call the Health API on URL: {}", url);
+        return webClient.get()
+            .uri(url)
+            .retrieve()
+            .bodyToMono(String.class)
+            .map(s -> new Health.Builder().up().build())
+            .onErrorResume(ex -> Mono.just(new Health.Builder().down(ex).build()))
+            .log();
     }
 
     @Override

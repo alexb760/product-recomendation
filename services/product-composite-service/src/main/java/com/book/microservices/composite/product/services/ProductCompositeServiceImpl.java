@@ -8,13 +8,13 @@ import com.book.api.composite.product.ServiceAddresses;
 import com.book.api.core.product.Product;
 import com.book.api.core.recomendation.Recommendation;
 import com.book.api.core.review.Review;
-import com.book.util.exception.NotFoundException;
 import com.book.util.http.ServiceUtil;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 /** @author Alexander Bravo */
 @Slf4j
@@ -82,30 +82,38 @@ public class ProductCompositeServiceImpl implements ProductCompositeService {
   }
 
   @Override
-  public ProductAggregate getProduct(int productId) {
-    Product product = integration.getProduct(productId);
-    if (product == null)
-      throw new NotFoundException("No product found for productId: " + productId);
+  public Mono<ProductAggregate> getProduct(int productId) {
+     // --- Blocking API refer to git tag v1.0.0-cap6
 
-    List<Recommendation> recommendations = integration.getRecommendations(productId);
-
-    List<Review> reviews = integration.getReviews(productId);
-
-    return createProductAggregate(
-        product, recommendations, reviews, serviceUtil.getServiceAddress());
+    // --- Non-Blocking code ---//
+    return Mono.zip(
+        values -> createProductAggregate(
+            (Product) values[0],
+            (List<Recommendation>) values[1],
+            (List<Review>) values[2],
+            serviceUtil.getServiceAddress()),
+        integration.getProduct(productId),
+        integration.getRecommendations(productId).collectList(),
+        integration.getReviews(productId).collectList())
+        .doOnError(ex -> log.warn("getCompositeProduct failed: {}", ex.toString()))
+        .log();
   }
 
   @Override
   public void deleteCompositeProduct(int productId) {
-    log.debug("deleteCompositeProduct: Deletes a product aggregate for productId: {}", productId);
+    try
+    {
+      log.debug("deleteCompositeProduct: Deletes a product aggregate for productId: {}", productId);
 
-    integration.deleteProduct(productId);
+      integration.deleteProduct(productId);
+      integration.deleteRecommendations(productId);
+      integration.deleteReviews(productId);
 
-    integration.deleteRecommendations(productId);
-
-    integration.deleteReviews(productId);
-
-    log.debug("getCompositeProduct: aggregate entities deleted for productId: {}", productId);
+      log.debug("getCompositeProduct: aggregate entities deleted for productId: {}", productId);
+    } catch (RuntimeException e) {
+      log.warn("deleteCompositeProduct failed: {}", e.toString());
+      throw e;
+    }
   }
 
   private ProductAggregate createProductAggregate(
@@ -124,7 +132,8 @@ public class ProductCompositeServiceImpl implements ProductCompositeService {
         (recommendations == null)
             ? null
             : recommendations.stream()
-                .map(r ->
+                .map(
+                    r ->
                         new RecommendationSummary(
                             r.getRecommendationId(), r.getAuthor(), r.getContent(), r.getRate()))
                 .collect(Collectors.toList());
@@ -134,7 +143,10 @@ public class ProductCompositeServiceImpl implements ProductCompositeService {
         (reviews == null)
             ? null
             : reviews.stream()
-                .map(r -> new ReviewSummary(r.getReviewId(), r.getAuthor(), r.getContent(), r.getSubject()))
+                .map(
+                    r ->
+                        new ReviewSummary(
+                            r.getReviewId(), r.getAuthor(), r.getSubject(), r.getContent()))
                 .collect(Collectors.toList());
 
     // 4. Create info regarding the involved microservices addresses

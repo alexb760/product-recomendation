@@ -1,6 +1,5 @@
 package com.book.microservices.core.review;
 
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -19,6 +19,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /** @author Alexander Bravo */
 @ExtendWith(SpringExtension.class)
@@ -39,15 +41,15 @@ public class ProductCompositeServiceApplicationTests {
 
     // We go for Junit 5 instead.
     given(compositeIntegration.getProduct(PRODUCT_ID_OK))
-        .willReturn(new Product(PRODUCT_ID_OK, "name", 1, "mock-address"));
+        .willReturn(Mono.just(new Product(PRODUCT_ID_OK, "name", 1, "mock-address")));
     given(compositeIntegration.getRecommendations(PRODUCT_ID_OK))
-        .willReturn(
+        .willReturn(Flux.fromIterable(
             singletonList(
-                new Recommendation(PRODUCT_ID_OK, 1, "author", 1, "content", "mock address")));
+                new Recommendation(PRODUCT_ID_OK, 1, "author", 1, "content", "mock address"))));
     given(compositeIntegration.getReviews(PRODUCT_ID_OK))
-        .willReturn(
+        .willReturn(Flux.fromIterable(
             singletonList(
-                new Review(PRODUCT_ID_OK, 1, "author", "subject", "content", "mock address")));
+                new Review(PRODUCT_ID_OK, 1, "author", "subject", "content", "mock address"))));
 
     given(compositeIntegration.getProduct(PRODUCT_ID_NOT_FOUND))
         .willThrow(new NotFoundException("NOT FOUND: " + PRODUCT_ID_NOT_FOUND));

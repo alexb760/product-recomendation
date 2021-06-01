@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import reactor.core.publisher.Mono;
 
 /** @author Alexander Bravo */
 @Api
@@ -51,7 +52,7 @@ public interface ProductCompositeService {
       @ApiResponse(responseCode =  "422 - Unprocessable entity, input parameters caused the processing to fails. See response message for more information.")
   })
   @GetMapping(value = "/product-composite/{productId}", produces = MediaType.APPLICATION_JSON_VALUE)
-  ProductAggregate getProduct(@PathVariable int productId);
+  Mono<ProductAggregate> getProduct(@PathVariable int productId);
 
   /**
    * Sample usage:
