@@ -11,6 +11,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import com.book.api.core.review.Review;
 import com.book.microservices.core.review.persistence.ReviewRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,6 +107,7 @@ class ReviewServiceApplicationTests {
         .isEqualTo("Required int parameter 'productId' is not present");
   }
 
+  @Disabled
   @Test
   public void getReviewsInvalidParameter() {
 

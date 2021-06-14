@@ -1,5 +1,7 @@
 package com.book.microservices.composite.product.services;
 
+import static com.book.api.event.Event.Type.CREATE;
+import static com.book.api.event.Event.Type.DELETE;
 import com.book.api.core.product.Product;
 import com.book.api.core.product.ProductService;
 import com.book.api.core.recomendation.Recommendation;
@@ -82,23 +84,21 @@ public class ProductCompositeIntegration
         this.mapper = mapper;
 
         // "http://" + productServiceHost + ":" + productServicePort + "/product/";
-        productServiceUrl = getFormattedURL(productServiceHost, productServicePort, "product/");
-        recommendationServiceUrl =
-            getFormattedURL(
-                recommendationServiceHost, recommendationServicePort, "recommendation?productId=");
-        reviewServiceUrl = getFormattedURL(reviewServiceHost, reviewServicePort, "/review?productId=");
+        productServiceUrl = getFormattedURL(productServiceHost, productServicePort );
+        recommendationServiceUrl = getFormattedURL(recommendationServiceHost, recommendationServicePort);
+        reviewServiceUrl = getFormattedURL(reviewServiceHost, reviewServicePort);
 
         this.webClient = webClient.build();
     }
 
-    private String getFormattedURL(String hostName, int servicePort, String pathAPI) {
-        return String.format("http://%s:%s/%s", hostName, servicePort, pathAPI);
+    private String getFormattedURL(String hostName, int servicePort) {
+        return String.format("http://%s:%s", hostName, servicePort);
     }
 
     @Override
     public Product getProductFake(int productId) {
         try {
-            String url = productServiceUrl + productId;
+            String url = productServiceUrl + "/product/" + productId;
             log.debug("Will call getProduct API on URL: {}", url);
 
             Product product = restTemplate.getForObject(url, Product.class);
@@ -123,13 +123,13 @@ public class ProductCompositeIntegration
     public Product createProduct(Product body) {
      messageSources.outputProducts()
          .send(MessageBuilder
-             .withPayload(new Event<>(Event.Type.CREATE, body.getProductId(), body)).build());
+             .withPayload(new Event<>(CREATE, body.getProductId(), body)).build());
      return body;
     }
 
     @Override
     public Mono<Product> getProduct(int productId) {
-        String url = productServiceUrl + "/" + productId;
+        String url = productServiceUrl + "/product/" + productId;
         return webClient
             .get()
             .uri(url)
@@ -142,7 +142,7 @@ public class ProductCompositeIntegration
     @Override
     public void deleteProduct(int productId) {
         messageSources.outputProducts()
-            .send(MessageBuilder.withPayload(new Event<>(Event.Type.DELETE, productId, null))
+            .send(MessageBuilder.withPayload(new Event<>(DELETE, productId, null))
                 .build());
     }
 
@@ -156,23 +156,14 @@ public class ProductCompositeIntegration
 
     @Override
     public Recommendation createRecommendation(Recommendation body) {
-        try {
-            String url = recommendationServiceUrl;
-            log.debug("Will post a new recommendation to URL: {}", url);
-
-            Recommendation recommendation = restTemplate.postForObject(url, body, Recommendation.class);
-            log.debug("Created a recommendation with id: {}", recommendation.getProductId());
-
-            return recommendation;
-
-        } catch (HttpClientErrorException ex) {
-            throw handleHttpClientException(ex);
-        }
+        messageSources.outputRecommendations()
+            .send(MessageBuilder.withPayload(new Event<>(CREATE, body.getProductId(), body)).build());
+        return body;
     }
 
     @Override
     public Flux<Recommendation> getRecommendations(int productId) {
-            String url = recommendationServiceUrl + productId;
+            String url = recommendationServiceUrl + "/recommendation?productId=" + productId;
             log.debug("Will call getRecommendations API on URL: {}", url);
 
             return webClient.get().uri(url)
@@ -184,37 +175,20 @@ public class ProductCompositeIntegration
 
     @Override
     public void deleteRecommendations(int productId) {
-        try {
-            String url = recommendationServiceUrl + productId;
-            log.debug("Will call the deleteRecommendations API on URL: {}", url);
-
-            restTemplate.delete(url);
-
-        } catch (HttpClientErrorException ex) {
-            throw handleHttpClientException(ex);
-        }
+        messageSources.outputRecommendations()
+            .send(MessageBuilder.withPayload(new Event<>(DELETE, productId, null)).build());
     }
 
     @Override
     public Review createReview(Review body) {
-
-        try {
-            String url = reviewServiceUrl;
-            log.debug("Will post a new review to URL: {}", url);
-
-            Review review = restTemplate.postForObject(url, body, Review.class);
-            log.debug("Created a review with id: {}", review.getProductId());
-
-            return review;
-
-        } catch (HttpClientErrorException ex) {
-            throw handleHttpClientException(ex);
-        }
+        messageSources.outputReviews()
+            .send(MessageBuilder.withPayload(new Event<>(CREATE, body.getProductId(), body)).build());
+        return body;
     }
 
     @Override
     public Flux<Review> getReviews(int productId) {
-       String url = reviewServiceUrl + productId;
+       String url = reviewServiceUrl + "/review?productId=" + productId;
 
        log.debug("Will call getReviews API on URL: {}", url);
         // Return an empty result if something goes wrong to make it possible for the composite service to return partial responses
