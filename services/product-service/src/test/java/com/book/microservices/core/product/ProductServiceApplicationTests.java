@@ -1,8 +1,11 @@
 package com.book.microservices.core.product;
 
+import static com.book.api.event.Event.Type.CREATE;
+import static com.book.api.event.Event.Type.DELETE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static reactor.core.publisher.Mono.just;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -12,15 +15,21 @@ import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import com.book.api.core.product.Product;
+import com.book.api.event.Event;
 import com.book.microservices.core.product.persintence.ProductRepository;
 import com.book.microservices.core.product.services.ProductServiceImpl;
+import com.book.util.exception.InvalidInputException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.stream.messaging.Sink;
 import org.springframework.http.HttpStatus;
+import org.springframework.integration.channel.AbstractMessageChannel;
+import org.springframework.messaging.MessagingException;
+import org.springframework.messaging.support.GenericMessage;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -34,13 +43,16 @@ class ProductServiceApplicationTests {
 
   @Autowired private ProductRepository repository;
   @Autowired private ProductServiceImpl productService;
+  @Autowired private Sink chanels;
+
+  private AbstractMessageChannel input = null;
 
   @BeforeEach
   public void setupDb() {
+    input = (AbstractMessageChannel) chanels.input();
     repository.deleteAll().block();
   }
 
-  @Disabled
   @Test
   public void getProductById() {
 
@@ -49,9 +61,7 @@ class ProductServiceApplicationTests {
     assertNull(repository.findByProductId(productId).block());
     assertEquals(0, repository.count().block());
 
-//    postAndVerifyProduct(productId, OK);
-    Product product = new Product(productId, "Name " + productId, productId, "SA");
-    productService.createProduct(product);
+    sendCreateProductEvent(productId);
 
     assertNotNull(repository.findByProductId(productId).block());
     assertEquals(1, repository.count().block());
@@ -59,39 +69,52 @@ class ProductServiceApplicationTests {
     getAndVerifyProduct(productId, OK).jsonPath("$.productId").isEqualTo(productId);
   }
 
-  @Disabled(value = "WIP - Will work when event-driven is implemented")
+  @Disabled(value = "WIP - Investigate why Mongo db allows create an entity twice")
   @Test
   public void duplicateError() {
 
     int productId = 1;
 
-//    postAndVerifyProduct(productId, OK);
-    Product product = new Product(productId, "Name " + productId, productId, "SA");
-    productService.createProduct(product);
+    assertNull(repository.findByProductId(productId).block());
+
+    sendCreateProductEvent(productId);
+
     assertNotNull(repository.findByProductId(productId).block());
 
-    postAndVerifyProduct(productId, UNPROCESSABLE_ENTITY)
-        .jsonPath("$.path")
-        .isEqualTo("/product")
-        .jsonPath("$.message")
-        .isEqualTo("Duplicate key, Product Id: " + productId);
+    try {
+      sendCreateProductEvent(productId);
+      fail("Expected a MessagingException here!");
+    } catch (MessagingException me) {
+      if (me.getCause() instanceof InvalidInputException)	{
+        InvalidInputException iie = (InvalidInputException)me.getCause();
+        assertEquals("Duplicate key, Product Id: " + productId, iie.getMessage());
+      } else {
+        fail("Expected a InvalidInputException as the root cause!");
+      }
+    }
+
+//    int productId = 1;
+//
+//    Product product = new Product(productId, "Name " + productId, productId, "SA");
+//    productService.createProduct(product);
+//    assertNotNull(repository.findByProductId(productId).block());
+//
+//    postAndVerifyProduct(productId, UNPROCESSABLE_ENTITY)
+//        .jsonPath("$.path")
+//        .isEqualTo("/product")
+//        .jsonPath("$.message")
+//        .isEqualTo("Duplicate key, Product Id: " + productId);
   }
 
-  @Disabled(value = "WIP - Will work when event-driven is implemented")
   @Test
   public void deleteProduct() {
 
     int productId = 1;
 
-//    postAndVerifyProduct(productId, OK);
-    Product product = new Product(productId, "Name " + productId, productId, "SA");
-    productService.createProduct(product);
+    sendCreateProductEvent(productId);
     assertNotNull(repository.findByProductId(productId).block());
 
-    deleteAndVerifyProduct(productId, OK);
-    assertNull(repository.findByProductId(productId).block());
-
-    deleteAndVerifyProduct(productId, OK);
+    sendDeleteProductEvent(productId);
   }
 
   @Test
@@ -162,26 +185,26 @@ class ProductServiceApplicationTests {
         .expectBody();
   }
 
-  private WebTestClient.BodyContentSpec deleteAndVerifyProduct(
-      int productId, HttpStatus expectedStatus) {
-    return client
-        .delete()
-        .uri("/product/" + productId)
-        .accept(APPLICATION_JSON)
-        .exchange()
-        .expectStatus()
-        .isEqualTo(expectedStatus)
-        .expectBody();
+  //  private WebTestClient.BodyContentSpec deleteAndVerifyProduct(
+  //      int productId, HttpStatus expectedStatus) {
+  //    return client
+  //        .delete()
+  //        .uri("/product/" + productId)
+  //        .accept(APPLICATION_JSON)
+  //        .exchange()
+  //        .expectStatus()
+  //        .isEqualTo(expectedStatus)
+  //        .expectBody();
+  //  }
+
+  private void sendCreateProductEvent(int productId) {
+    Product product = new Product(productId, "Name " + productId, productId, "SA");
+    Event<Integer, Product> event = new Event(CREATE, productId, product);
+    input.send(new GenericMessage<>(event));
   }
 
-  //  private void sendCreateProductEvent(int productId) {
-  //    Product product = new Product(productId, "Name " + productId, productId, "SA");
-  //    Event<Integer, Product> event = new Event(CREATE, productId, product);
-  //    input.send(new GenericMessage<>(event));
-  //  }
-  //
-  //  private void sendDeleteProductEvent(int productId) {
-  //    Event<Integer, Product> event = new Event(DELETE, productId, null);
-  //    input.send(new GenericMessage<>(event));
-  //  }
+  private void sendDeleteProductEvent(int productId) {
+    Event<Integer, Product> event = new Event(DELETE, productId, null);
+    input.send(new GenericMessage<>(event));
+  }
 }

@@ -8,6 +8,10 @@ group = 'com.book.microservices.composite.product'
 version = '1.0.0-SNAPSHOT'
 sourceCompatibility = '14'
 
+ext {
+	springCloudVersion = "2020.0.2"
+}
+
 repositories {
 	mavenCentral()
 	//Special repository to springFox
@@ -33,14 +37,24 @@ dependencies {
 	// https://mvnrepository.com/artifact/io.springfox/springfox-boot-starter
 	implementation group: 'io.springfox', name: 'springfox-boot-starter', version: '3.0.0'
 
+	implementation('org.springframework.cloud:spring-cloud-starter-stream-rabbit')
+	implementation('org.springframework.cloud:spring-cloud-starter-stream-kafka')
+
 	// Enables reactive support
 	implementation('io.springfox:springfox-spring-webflux:3.0.0')
 
 	testCompileOnly 'org.projectlombok:lombok:1.18.20'
 	testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation('org.springframework.cloud:spring-cloud-stream-test-support')
 	testImplementation 'io.projectreactor:reactor-test'
 	testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
 }
 
 test {

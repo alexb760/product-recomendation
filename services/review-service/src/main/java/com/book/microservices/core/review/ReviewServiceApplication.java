@@ -17,6 +17,7 @@ import reactor.core.scheduler.Schedulers;
 @ComponentScan("com.book")
 public class ReviewServiceApplication {
 
+  //spring.datasource.maximum-pool-size:10  -- default value
   private final Integer connectionPoolSize;
 
   @Autowired

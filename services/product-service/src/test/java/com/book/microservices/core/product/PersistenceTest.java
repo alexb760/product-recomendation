@@ -14,9 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.test.StepVerifier;
 
@@ -81,7 +78,7 @@ public class PersistenceTest {
       .verifyComplete();
  }
 
-  @Disabled(value = "WIP - it does allow duplicate")
+  @Disabled(value = "WIP - it does allow duplicate -Investigate")
   @Test
   public void duplicateError() {
    ProductEntity entity = new ProductEntity(savedEntity.getProductId(), "n", 1);
@@ -114,42 +111,13 @@ public class PersistenceTest {
       .verifyComplete();
  }
 
-// @Test
-// public void paging() {
-//
-//  repository.deleteAll();
-//
-//  List<ProductEntity> newProducts = rangeClosed(1001, 1010)
-//      .mapToObj(i -> new ProductEntity(i, "name " + i, i))
-//      .collect(Collectors.toList());
-//  repository.saveAll(newProducts);
-//
-//  Pageable nextPage = PageRequest.of(0, 4, ASC, "productId");
-//  nextPage = testNextPage(nextPage, "[1001, 1002, 1003, 1004]", true);
-//  nextPage = testNextPage(nextPage, "[1005, 1006, 1007, 1008]", true);
-//  nextPage = testNextPage(nextPage, "[1009, 1010]", false);
+// private void assertEqualsProduct(ProductEntity expectedEntity, ProductEntity actualEntity) {
+//  assertThat(expectedEntity.getId()).isEqualTo( actualEntity.getId());
+//  assertThat(expectedEntity.getVersion()).isEqualTo( actualEntity.getVersion());
+//  assertThat(expectedEntity.getProductId()).isEqualTo( actualEntity.getProductId());
+//  assertThat(expectedEntity.getName()).isEqualTo( actualEntity.getName());
+//  assertThat(expectedEntity.getWeight()).isEqualTo( actualEntity.getWeight());
 // }
-//
-//  private Pageable testNextPage(
-//      Pageable nextPage, String expectedProductIds, boolean expectsNextPage) {
-//    Page<ProductEntity> productPage = repository.findAll(nextPage).bl;
-//    assertThat(expectedProductIds)
-//        .isEqualTo(
-//            productPage.getContent().stream()
-//                .map(ProductEntity::getProductId)
-//                .collect(Collectors.toList())
-//                .toString());
-//    assertThat(expectsNextPage).isEqualTo(productPage.hasNext());
-//    return productPage.nextPageable();
-//  }
-
- private void assertEqualsProduct(ProductEntity expectedEntity, ProductEntity actualEntity) {
-  assertThat(expectedEntity.getId()).isEqualTo( actualEntity.getId());
-  assertThat(expectedEntity.getVersion()).isEqualTo( actualEntity.getVersion());
-  assertThat(expectedEntity.getProductId()).isEqualTo( actualEntity.getProductId());
-  assertThat(expectedEntity.getName()).isEqualTo( actualEntity.getName());
-  assertThat(expectedEntity.getWeight()).isEqualTo( actualEntity.getWeight());
- }
 
   private boolean areProductEqual(ProductEntity expectedEntity, ProductEntity actualEntity) {
     return (expectedEntity.getId().equals(actualEntity.getId()))

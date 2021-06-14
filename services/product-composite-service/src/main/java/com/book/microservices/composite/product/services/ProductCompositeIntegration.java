@@ -6,15 +6,21 @@ import com.book.api.core.recomendation.Recommendation;
 import com.book.api.core.recomendation.RecommendationService;
 import com.book.api.core.review.Review;
 import com.book.api.core.review.ReviewService;
+import com.book.api.event.Event;
 import com.book.util.exception.InvalidInputException;
 import com.book.util.exception.NotFoundException;
 import com.book.util.http.HttpErrorInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
+import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.annotation.Output;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -25,7 +31,9 @@ import reactor.core.publisher.Mono;
 
 /** @author Alexander Bravo */
 @Slf4j
+@EnableBinding(ProductCompositeIntegration.MessageSources.class)
 @Component
+@Getter
 public class ProductCompositeIntegration
     implements ProductService, RecommendationService, ReviewService {
 
@@ -37,6 +45,26 @@ public class ProductCompositeIntegration
     private final String productServiceUrl;
     private final String recommendationServiceUrl;
     private final String reviewServiceUrl;
+
+    //Event Driver declarations
+    private MessageSources messageSources;
+
+    //This interface is used to declare the needed topic to bind to
+    public interface MessageSources {
+
+        String OUTPUT_PRODUCTS = "output-products";
+        String OUTPUT_RECOMMENDATIONS = "output-recommendations";
+        String OUTPUT_REVIEWS = "output-reviews";
+
+        @Output(OUTPUT_PRODUCTS)
+        MessageChannel outputProducts();
+
+        @Output(OUTPUT_RECOMMENDATIONS)
+        MessageChannel outputRecommendations();
+
+        @Output(OUTPUT_REVIEWS)
+        MessageChannel outputReviews();
+    }
 
     @Autowired
     public ProductCompositeIntegration(
@@ -93,18 +121,10 @@ public class ProductCompositeIntegration
 
     @Override
     public Product createProduct(Product body) {
-        try {
-            String url = productServiceUrl;
-            log.debug("Will post a new product to URL: {}", url);
-
-            Product product = restTemplate.postForObject(url, body, Product.class);
-            log.debug("Created a product with id: {}", product.getProductId());
-
-            return product;
-
-        } catch (HttpClientErrorException ex) {
-            throw handleHttpClientException(ex);
-        }
+     messageSources.outputProducts()
+         .send(MessageBuilder
+             .withPayload(new Event<>(Event.Type.CREATE, body.getProductId(), body)).build());
+     return body;
     }
 
     @Override
@@ -121,15 +141,9 @@ public class ProductCompositeIntegration
 
     @Override
     public void deleteProduct(int productId) {
-        try {
-            String url = productServiceUrl + "/" + productId;
-            log.debug("Will call the deleteProduct API on URL: {}", url);
-
-            restTemplate.delete(url);
-
-        } catch (HttpClientErrorException ex) {
-            throw handleHttpClientException(ex);
-        }
+        messageSources.outputProducts()
+            .send(MessageBuilder.withPayload(new Event<>(Event.Type.DELETE, productId, null))
+                .build());
     }
 
     private String getErrorMessage(HttpClientErrorException ex) {
