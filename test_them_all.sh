@@ -167,7 +167,7 @@ assertEqual "\"Invalid productId: -1\"" "$(echo $RESPONSE | jq .message)"
 
 # Verify that a 400 (Bad Request) error error is returned for a productId that is not a number, i.e. invalid format
 assertCurl 400 "curl http://$HOST:$PORT/product-composite/invalidProductId -s"
-assertEqual "\"\"" "$(echo $RESPONSE | jq .message)"
+assertEqual "\"Type mismatch.\"" "$(echo $RESPONSE | jq .message)"
 
 if [[ $@ == *"stop"* ]]
 then

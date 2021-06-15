@@ -73,6 +73,7 @@ public class ProductCompositeIntegration
         WebClient.Builder webClient,
         RestTemplate restTemplate,
         ObjectMapper mapper,
+        MessageSources messageSources,
         @Value("${app.product-service.host}") String productServiceHost,
         @Value("${app.product-service.port}") int productServicePort,
         @Value("${app.recommendation-service.host}") String recommendationServiceHost,
@@ -82,6 +83,7 @@ public class ProductCompositeIntegration
 
         this.restTemplate = restTemplate;
         this.mapper = mapper;
+        this.messageSources = messageSources;
 
         // "http://" + productServiceHost + ":" + productServicePort + "/product/";
         productServiceUrl = getFormattedURL(productServiceHost, productServicePort );
@@ -226,15 +228,8 @@ public class ProductCompositeIntegration
 
     @Override
     public void deleteReviews(int productId) {
-        try {
-            String url = reviewServiceUrl + productId;
-            log.debug("Will call the deleteReviews API on URL: {}", url);
-
-            restTemplate.delete(url);
-
-        } catch (HttpClientErrorException ex) {
-            throw handleHttpClientException(ex);
-        }
+     messageSources.outputReviews()
+            .send(MessageBuilder.withPayload(new Event<>(DELETE, productId, null)).build());
     }
 
 
