@@ -9,6 +9,7 @@
 package com.book.api.event;
 
 import static java.time.LocalDateTime.now;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
 
 /**
@@ -24,9 +25,10 @@ import java.time.LocalDateTime;
 public class Event<K, T> {
  public enum Type {CREATE, DELETE}
 
- private Event.Type eventType;
- private K key;
- private T data;
+ private final Event.Type eventType;
+ private final K key;
+ private final T data;
+// @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
  private LocalDateTime eventCreatedAt;
 
  public Event() {

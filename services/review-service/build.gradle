@@ -1,16 +1,16 @@
 plugins {
-	id 'org.springframework.boot' version '2.4.5'
-	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'org.springframework.boot'
+	id 'io.spring.dependency-management'
 	id 'java'
 }
 
 group = 'com.book.microservices.core.review'
-version = '1.0.0-SNAPSHOT'
+version = app_version
 sourceCompatibility = '14'
 
 ext {
 	mapstructVersion = "1.4.1.Final"
-	springCloudVersion = "2020.0.2"
+	springCloudVersion = springCloud_version
 }
 repositories {
 	mavenCentral()

@@ -11,13 +11,21 @@ import com.book.api.core.product.Product;
 import com.book.api.event.Event;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Alexander Bravo
  */
 public class IsSameEventTests {
- ObjectMapper mapper = new ObjectMapper();
+ private final ObjectMapper mapper;
+
+ public IsSameEventTests(){
+  mapper = new ObjectMapper();
+  mapper.registerModule(new JSR310Module());
+  mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+ }
 
  @Test
  public void testEventObjectCompare() throws JsonProcessingException {

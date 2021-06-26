@@ -1,4 +1,4 @@
-version: '3'
+version: '2.1'
 
 services:
   product:
@@ -17,21 +17,21 @@ services:
       - kafka
       - mongodb
 
-  product-p1:
-    build: services/product-service
-    mem_limit: 350m
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - MANAGEMENT_HEALTH_RABBIT_ENABLED=false
-      - SPRING_CLOUD_STREAM_DEFAULTBINDER=kafka
-      - SPRING_CLOUD_STREAM_KAFKA_REPLICATIONFACTOR=1
-      - SPRING_CLOUD_STREAM_BINDINGS_PRODUCER_PARTITIONCOUNT=1
-      - SPRING_CLOUD_STREAM_BINDINGS_INPUT_CONSUMER_PARTITIONED=true
-      - SPRING_CLOUD_STREAM_BINDINGS_INPUT_CONSUMER_INSTANCECOUNT=2
-      - SPRING_CLOUD_STREAM_BINDINGS_INPUT_CONSUMER_INSTANCEINDEX=1
-    depends_on:
-      - kafka
-      - mongodb
+#  product-p1:
+#    build: services/product-service
+#    mem_limit: 350m
+#    environment:
+#      - SPRING_PROFILES_ACTIVE=docker
+#      - MANAGEMENT_HEALTH_RABBIT_ENABLED=false
+#      - SPRING_CLOUD_STREAM_DEFAULTBINDER=kafka
+#      - SPRING_CLOUD_STREAM_KAFKA_REPLICATIONFACTOR=1
+#      - SPRING_CLOUD_STREAM_BINDINGS_PRODUCER_PARTITIONCOUNT=1
+#      - SPRING_CLOUD_STREAM_BINDINGS_INPUT_CONSUMER_PARTITIONED=true
+#      - SPRING_CLOUD_STREAM_BINDINGS_INPUT_CONSUMER_INSTANCECOUNT=2
+#      - SPRING_CLOUD_STREAM_BINDINGS_INPUT_CONSUMER_INSTANCEINDEX=1
+#    depends_on:
+#      - kafka
+#      - mongodb
 
   recommendation:
     build: services/recomendation-service
@@ -49,21 +49,21 @@ services:
       - kafka
       - mongodb
 
-  recommendation-p1:
-    build: services/recomendation-service
-    mem_limit: 350m
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - MANAGEMENT_HEALTH_RABBIT_ENABLED=false
-      - SPRING_CLOUD_STREAM_DEFAULTBINDER=kafka
-      - SPRING_CLOUD_STREAM_KAFKA_REPLICATIONFACTOR=1
-      - SPRING_CLOUD_STREAM_BINDINGS_PRODUCER_PARTITIONCOUNT=1
-      - SPRING_CLOUD_STREAM_BINDINGS_INPUT_CONSUMER_PARTITIONED=true
-      - SPRING_CLOUD_STREAM_BINDINGS_INPUT_CONSUMER_INSTANCECOUNT=2
-      - SPRING_CLOUD_STREAM_BINDINGS_INPUT_CONSUMER_INSTANCEINDEX=1
-    depends_on:
-      - kafka
-      - mongodb
+#  recommendation-p1:
+#    build: services/recomendation-service
+#    mem_limit: 350m
+#    environment:
+#      - SPRING_PROFILES_ACTIVE=docker
+#      - MANAGEMENT_HEALTH_RABBIT_ENABLED=false
+#      - SPRING_CLOUD_STREAM_DEFAULTBINDER=kafka
+#      - SPRING_CLOUD_STREAM_KAFKA_REPLICATIONFACTOR=1
+#      - SPRING_CLOUD_STREAM_BINDINGS_PRODUCER_PARTITIONCOUNT=1
+#      - SPRING_CLOUD_STREAM_BINDINGS_INPUT_CONSUMER_PARTITIONED=true
+#      - SPRING_CLOUD_STREAM_BINDINGS_INPUT_CONSUMER_INSTANCECOUNT=2
+#      - SPRING_CLOUD_STREAM_BINDINGS_INPUT_CONSUMER_INSTANCEINDEX=1
+#    depends_on:
+#      - kafka
+#      - mongodb
 
   review:
     build: services/review-service
@@ -83,23 +83,23 @@ services:
       kafka:
         condition: service_started
 
-  review-p1:
-    build: services/review-service
-    mem_limit: 350m
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - MANAGEMENT_HEALTH_RABBIT_ENABLED=false
-      - SPRING_CLOUD_STREAM_DEFAULTBINDER=kafka
-      - SPRING_CLOUD_STREAM_KAFKA_REPLICATIONFACTOR=1
-      - SPRING_CLOUD_STREAM_BINDINGS_PRODUCER_PARTITIONCOUNT=1
-      - SPRING_CLOUD_STREAM_BINDINGS_INPUT_CONSUMER_PARTITIONED=true
-      - SPRING_CLOUD_STREAM_BINDINGS_INPUT_CONSUMER_INSTANCECOUNT=2
-      - SPRING_CLOUD_STREAM_BINDINGS_INPUT_CONSUMER_INSTANCEINDEX=1
-    depends_on:
-      mysql:
-        condition: service_healthy
-      kafka:
-        condition: service_started
+#  review-p1:
+#    build: services/review-service
+#    mem_limit: 350m
+#    environment:
+#      - SPRING_PROFILES_ACTIVE=docker
+#      - MANAGEMENT_HEALTH_RABBIT_ENABLED=false
+#      - SPRING_CLOUD_STREAM_DEFAULTBINDER=kafka
+#      - SPRING_CLOUD_STREAM_KAFKA_REPLICATIONFACTOR=1
+#      - SPRING_CLOUD_STREAM_BINDINGS_PRODUCER_PARTITIONCOUNT=1
+#      - SPRING_CLOUD_STREAM_BINDINGS_INPUT_CONSUMER_PARTITIONED=true
+#      - SPRING_CLOUD_STREAM_BINDINGS_INPUT_CONSUMER_INSTANCECOUNT=2
+#      - SPRING_CLOUD_STREAM_BINDINGS_INPUT_CONSUMER_INSTANCEINDEX=1
+#    depends_on:
+#      mysql:
+#        condition: service_healthy
+#      kafka:
+#        condition: service_started
 
   product-composite:
     build: services/product-composite-service
@@ -119,7 +119,8 @@ services:
       - SPRING_CLOUD_STREAM_BINDINGS_OUTPUT-REVIEWS_PRODUCER_PARTITION-KEY-EXPRESSION=payload.key
       - SPRING_CLOUD_STREAM_BINDINGS_OUTPUT-REVIEWS_PRODUCER_PARTITION-COUNT=2
     depends_on:
-      - kafka
+      kafka:
+        condition: service_started
 
   # $ mongo
   mongodb:

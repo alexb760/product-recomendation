@@ -5,6 +5,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,11 +18,14 @@ import org.hamcrest.TypeSafeMatcher;
 /** @author Alexander Bravo */
 @Slf4j
 public final class IsSameEvent extends TypeSafeMatcher<String> {
-  private final ObjectMapper mapper = new ObjectMapper();
+  private final ObjectMapper mapper;
   private final Event expectedEvent;
 
   private IsSameEvent(Event expectedEvent) {
     this.expectedEvent = expectedEvent;
+    mapper = new ObjectMapper();
+    mapper.registerModule(new JSR310Module());
+    mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
   }
 
   @Override
@@ -41,13 +46,13 @@ public final class IsSameEvent extends TypeSafeMatcher<String> {
 
   @Override
   public void describeTo(Description description) {
-   String expectedJson = convertObjectToJsonString(expectedEvent);
-   description.appendText("expected to look like " + expectedJson);
+    String expectedJson = convertObjectToJsonString(expectedEvent);
+    description.appendText("expected to look like " + expectedJson);
   }
 
- public static Matcher<String> sameEventExceptCreatedAt(Event expectedEvent) {
-  return new IsSameEvent(expectedEvent);
- }
+  public static Matcher<String> sameEventExceptCreatedAt(Event expectedEvent) {
+    return new IsSameEvent(expectedEvent);
+  }
 
   private Map getMapWithoutCreatedAt(Event event) {
     Map mapEvent = convertObjectToMap(event);

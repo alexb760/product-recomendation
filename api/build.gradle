@@ -1,6 +1,7 @@
 buildscript {
 	ext {
-		springBootVersion = '2.4.5'
+//		springBootVersion = '2.4.5'
+		springBootVersion = springBootPluginVersion
 	}
 	repositories {
 		mavenCentral()
@@ -21,7 +22,7 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 
 group = 'com.book.microservices.api'
-version = '1.0.0-SNAPSHOT'
+version = app_version
 sourceCompatibility = 14
 
 repositories {
