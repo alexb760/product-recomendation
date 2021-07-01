@@ -58,3 +58,12 @@ spring.data.mongodb.host: mongodb
 server.port: 8080
 spring.rabbitmq.host: rabbitmq
 spring.cloud.stream.kafka.binder.brokers: kafka
+# We are passing this properties directly from composer files
+#spring:
+#  cloud:
+#    stream:
+#      kafka:
+#        binder:
+#          autoAddPartitions: true
+#          minPartitionCount: 4
+#          replicationFactor: 1
