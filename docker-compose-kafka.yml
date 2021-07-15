@@ -127,6 +127,13 @@ services:
       kafka:
         condition: service_started
 
+  # Eureka server - discovery service patter
+  eureka:
+    build: spring-cloud/eureka-server
+    mem_limit: 350m
+    ports:
+      - "8761:8761"
+
   # $ mongo
   mongodb:
     image: mongo:3.6.9
