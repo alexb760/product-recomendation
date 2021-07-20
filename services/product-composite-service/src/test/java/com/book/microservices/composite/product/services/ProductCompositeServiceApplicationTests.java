@@ -24,7 +24,9 @@ import reactor.core.publisher.Mono;
 
 /** @author Alexander Bravo */
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(webEnvironment = RANDOM_PORT, properties = {"spring.data.mongodb.port: 0"})
+@SpringBootTest(
+    webEnvironment = RANDOM_PORT,
+    properties = {"spring.data.mongodb.port: 0", "eureka.client.enabled=false"})
 public class ProductCompositeServiceApplicationTests {
 
   private static final int PRODUCT_ID_OK = 1;

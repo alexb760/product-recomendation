@@ -2,6 +2,7 @@ package com.book.microservices.composite.product.services;
 
 import static com.book.api.event.Event.Type.CREATE;
 import static com.book.api.event.Event.Type.DELETE;
+
 import com.book.api.core.product.Product;
 import com.book.api.core.product.ProductService;
 import com.book.api.core.recomendation.Recommendation;
@@ -17,7 +18,6 @@ import java.io.IOException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.Output;
@@ -39,14 +39,15 @@ import reactor.core.publisher.Mono;
 public class ProductCompositeIntegration
     implements ProductService, RecommendationService, ReviewService {
 
-    private final WebClient webClient;
+    private WebClient webClient;
+    private final WebClient.Builder webClientBuilder;
 
     private final RestTemplate restTemplate;
     private final ObjectMapper mapper;
 
-    private final String productServiceUrl;
-    private final String recommendationServiceUrl;
-    private final String reviewServiceUrl;
+    private final String productServiceUrl = "http://product";
+    private final String recommendationServiceUrl = "http://recommendation";
+    private final String reviewServiceUrl = "http://review";
 
     //Event Driver declarations
     private MessageSources messageSources;
@@ -73,28 +74,13 @@ public class ProductCompositeIntegration
         WebClient.Builder webClient,
         RestTemplate restTemplate,
         ObjectMapper mapper,
-        MessageSources messageSources,
-        @Value("${app.product-service.host}") String productServiceHost,
-        @Value("${app.product-service.port}") int productServicePort,
-        @Value("${app.recommendation-service.host}") String recommendationServiceHost,
-        @Value("${app.recommendation-service.port}") int recommendationServicePort,
-        @Value("${app.review-service.host}") String reviewServiceHost,
-        @Value("${app.review-service.port}") int reviewServicePort) {
+        MessageSources messageSources) {
 
         this.restTemplate = restTemplate;
         this.mapper = mapper;
         this.messageSources = messageSources;
 
-        // "http://" + productServiceHost + ":" + productServicePort + "/product/";
-        productServiceUrl = getFormattedURL(productServiceHost, productServicePort );
-        recommendationServiceUrl = getFormattedURL(recommendationServiceHost, recommendationServicePort);
-        reviewServiceUrl = getFormattedURL(reviewServiceHost, reviewServicePort);
-
-        this.webClient = webClient.build();
-    }
-
-    private String getFormattedURL(String hostName, int servicePort) {
-        return String.format("http://%s:%s", hostName, servicePort);
+        this.webClientBuilder = webClient;
     }
 
     @Override
@@ -123,16 +109,16 @@ public class ProductCompositeIntegration
 
     @Override
     public Product createProduct(Product body) {
-     messageSources.outputProducts()
-         .send(MessageBuilder
-             .withPayload(new Event<>(CREATE, body.getProductId(), body)).build());
-     return body;
+        messageSources.outputProducts()
+            .send(MessageBuilder
+                .withPayload(new Event<>(CREATE, body.getProductId(), body)).build());
+        return body;
     }
 
     @Override
     public Mono<Product> getProduct(int productId) {
         String url = productServiceUrl + "/product/" + productId;
-        return webClient
+        return getWebClient()
             .get()
             .uri(url)
             .retrieve()
@@ -165,14 +151,14 @@ public class ProductCompositeIntegration
 
     @Override
     public Flux<Recommendation> getRecommendations(int productId) {
-            String url = recommendationServiceUrl + "/recommendation?productId=" + productId;
-            log.debug("Will call getRecommendations API on URL: {}", url);
+        String url = recommendationServiceUrl + "/recommendation?productId=" + productId;
+        log.debug("Will call getRecommendations API on URL: {}", url);
 
-            return webClient.get().uri(url)
-                .retrieve()
-                .bodyToFlux(Recommendation.class)
-                .log()
-                .onErrorResume(error -> Flux.empty());
+        return getWebClient().get().uri(url)
+            .retrieve()
+            .bodyToFlux(Recommendation.class)
+            .log()
+            .onErrorResume(error -> Flux.empty());
     }
 
     @Override
@@ -190,16 +176,16 @@ public class ProductCompositeIntegration
 
     @Override
     public Flux<Review> getReviews(int productId) {
-       String url = reviewServiceUrl + "/review?productId=" + productId;
+        String url = reviewServiceUrl + "/review?productId=" + productId;
 
-       log.debug("Will call getReviews API on URL: {}", url);
+        log.debug("Will call getReviews API on URL: {}", url);
         // Return an empty result if something goes wrong to make it possible for the composite service to return partial responses
-       return webClient.get()
-           .uri(url)
-           .retrieve()
-           .bodyToFlux(Review.class)
-           .log()
-           .onErrorResume(error -> Flux.empty());
+        return getWebClient().get()
+            .uri(url)
+            .retrieve()
+            .bodyToFlux(Review.class)
+            .log()
+            .onErrorResume(error -> Flux.empty());
     }
 
     public Mono<Health> getProductHealth() {
@@ -217,7 +203,7 @@ public class ProductCompositeIntegration
     private Mono<Health> getHealth(String url) {
         url += "/actuator/health";
         log.debug("Will call the Health API on URL: {}", url);
-        return webClient.get()
+        return getWebClient().get()
             .uri(url)
             .retrieve()
             .bodyToMono(String.class)
@@ -228,7 +214,7 @@ public class ProductCompositeIntegration
 
     @Override
     public void deleteReviews(int productId) {
-     messageSources.outputReviews()
+        messageSources.outputReviews()
             .send(MessageBuilder.withPayload(new Event<>(DELETE, productId, null)).build());
     }
 
@@ -278,5 +264,13 @@ public class ProductCompositeIntegration
         } catch (IOException ioex) {
             return ex.getMessage();
         }
+    }
+
+
+    private WebClient getWebClient() {
+        if (webClient == null) {
+            webClient = webClientBuilder.build();
+        }
+        return webClient;
     }
 }

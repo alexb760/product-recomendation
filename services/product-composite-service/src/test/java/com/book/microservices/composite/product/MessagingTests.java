@@ -35,15 +35,16 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 /** @author Alexander Bravo */
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+    properties = {"eureka.client.enabled=false"})
 public class MessagingTests {
 
   private static final int PRODUCT_ID_OK = 1;
   private static final int PRODUCT_ID_NOT_FOUND = 2;
   private static final int PRODUCT_ID_INVALID = 3;
 
-  @Autowired
-  private WebTestClient client;
+  @Autowired private WebTestClient client;
 
   @Autowired private ProductCompositeIntegration.MessageSources channels;
 

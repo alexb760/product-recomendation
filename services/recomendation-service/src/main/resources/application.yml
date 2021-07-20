@@ -1,4 +1,16 @@
 server.port: 7002
+spring.application.name: recommendation
+#Eureka client configuration.
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    initialInstanceInfoReplicationIntervalSeconds: 5
+    registryFetchIntervalSeconds: 5
+  instance:
+    leaseRenewalIntervalInSeconds: 5
+    leaseExpirationDurationInSeconds: 5
+
 server.error.include-message: always
 
 spring.data.mongodb:
@@ -51,6 +63,7 @@ management.endpoints.web.exposure.include: "*"
 spring.profiles: docker
 spring.data.mongodb.host: mongodb
 server.port: 8080
+eureka.client.serviceUrl.defaultZone: http://eureka:8761/eureka/
 spring.rabbitmq.host: rabbitmq
 spring.cloud.stream.kafka.binder.brokers: kafka
 # We are passing this properties directly from composer files

@@ -30,7 +30,9 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(webEnvironment = RANDOM_PORT, properties = {"spring.data.mongodb.port: 0"})
+@SpringBootTest(
+    webEnvironment = RANDOM_PORT,
+    properties = {"spring.data.mongodb.port: 0", "eureka.client.enabled=false"})
 class ProductCompositeServiceApplicationTests {
 
   private static final int PRODUCT_ID_OK = 1;
@@ -48,13 +50,15 @@ class ProductCompositeServiceApplicationTests {
         .thenReturn(just(new Product(PRODUCT_ID_OK, "name", 1, "mock-address")));
 
     when(compositeIntegration.getRecommendations(PRODUCT_ID_OK))
-        .thenReturn(Flux.fromIterable(
-            singletonList(
-                new Recommendation(PRODUCT_ID_OK, 1, "author", 1, "content", "mock address"))));
+        .thenReturn(
+            Flux.fromIterable(
+                singletonList(
+                    new Recommendation(PRODUCT_ID_OK, 1, "author", 1, "content", "mock address"))));
     when(compositeIntegration.getReviews(PRODUCT_ID_OK))
-        .thenReturn(Flux.fromIterable(
-            singletonList(
-                new Review(PRODUCT_ID_OK, 1, "author", "subject", "content", "mock address"))));
+        .thenReturn(
+            Flux.fromIterable(
+                singletonList(
+                    new Review(PRODUCT_ID_OK, 1, "author", "subject", "content", "mock address"))));
 
     when(compositeIntegration.getProduct(PRODUCT_ID_NOT_FOUND))
         .thenThrow(new NotFoundException("NOT FOUND: " + PRODUCT_ID_NOT_FOUND));
