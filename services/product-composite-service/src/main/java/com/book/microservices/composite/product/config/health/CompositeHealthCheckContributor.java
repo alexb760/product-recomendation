@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 
 /** @author Alexander Bravo */
 @Slf4j
-@Component("CheckHealthComponent")
+//@Component("CheckHealthComponent")
 public class CompositeHealthCheckContributor implements CompositeReactiveHealthContributor {
 
   private final Map<String, ReactiveHealthContributor> contrubutors = new LinkedHashMap<>();

@@ -45,12 +45,21 @@ services:
       rabbitmq:
         condition: service_healthy
 
-  product-composite:
-    build: services/product-composite-service
+# Since we are implementing age Service we do not need to expose this service directly.
+# now our gateway will take care of
+  gateway:
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    build: spring-cloud/gateway
     mem_limit: 350m
     ports:
       - "8080:8080"
-#      - "5005:5005"
+    networks:
+      - microservices
+
+  product-composite:
+    build: services/product-composite-service
+    mem_limit: 350m
     environment:
       - SPRING_PROFILES_ACTIVE=docker
 #      - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
@@ -64,8 +73,6 @@ services:
   eureka:
     build: spring-cloud/eureka-server
     mem_limit: 350m
-    ports:
-      - "8761:8761"
     networks:
       - microservices
 
