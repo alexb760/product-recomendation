@@ -88,8 +88,8 @@ services:
   product-composite:
     build: services/product-composite-service
     mem_limit: 350m
-    ports:
-      - "8080:8080"
+#    ports:
+#      - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - SPRING_CLOUD_STREAM_BINDINGS_OUTPUT-PRODUCTS_PRODUCER_PARTITION-KEY-EXPRESSION=payload.key
@@ -102,12 +102,21 @@ services:
       rabbitmq:
         condition: service_healthy
 
+
+  # Since we are implementing age Service we do not need to expose this service directly.
+  # now our gateway will take care of
+  gateway:
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    build: spring-cloud/gateway
+    mem_limit: 350m
+    ports:
+      - "8080:8080"
+
   # Eureka server - discovery service patter
   eureka:
     build: spring-cloud/eureka-server
     mem_limit: 350m
-    ports:
-      - "8761:8761"
 
   # $ mongo
   mongodb:
