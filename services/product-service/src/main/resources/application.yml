@@ -1,10 +1,17 @@
 server.port: 7001
 spring.application.name: product
+
+
+app:
+  eureka-username: u
+  eureka-password: p
+  eureka-server: localhost
+
 #Eureka configuration.
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: "http://${app.eureka-username}:${app.eureka-password}@${app.eureka-server}:8761/eureka/"
     initialInstanceInfoReplicationIntervalSeconds: 5
     registryFetchIntervalSeconds: 5
   instance:
@@ -68,9 +75,10 @@ spring.profiles: docker
 
 spring.data.mongodb.host: mongodb
 server.port: 8080
-eureka.client.serviceUrl.defaultZone: http://eureka:8761/eureka/
+#eureka.client.serviceUrl.defaultZone: http://eureka:8761/eureka/
 spring.rabbitmq.host: rabbitmq
 spring.cloud.stream.kafka.binder.brokers: kafka
+app.eureka-server: eureka
 # We are passing this properties directly from composer files
 #spring:
 #  cloud:

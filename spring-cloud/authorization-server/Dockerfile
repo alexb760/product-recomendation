@@ -7,9 +7,9 @@
 # in detach mode -- background:
 # run -d -p 8080:8080 -e "SPRING_PROFILES_ACTIVE=docker" springio/gs-spring-boot-docker --name product-prod
 FROM openjdk:15-jdk-alpine
-EXPOSE 8080
+EXPOSE 9999
 # Adding a specific user for the execution
-RUN addgroup -S gateway && adduser -S gateway -G gateway
-USER gateway:gateway
+RUN addgroup -S authorization-server && adduser -S authorization-server -G authorization-server
+USER authorization-server:authorization-server
 ADD ./build/libs/*.jar app.jar
 ENTRYPOINT ["java","-jar","/app.jar"]

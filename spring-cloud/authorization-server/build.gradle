@@ -1,0 +1,41 @@
+plugins {
+	id 'org.springframework.boot'
+	id 'io.spring.dependency-management'
+	id 'java'
+}
+
+group = 'com.book.micorservices'
+version = app_version
+sourceCompatibility = '14'
+
+repositories {
+	mavenCentral()
+}
+
+ext {
+	set('springCloudVersion', springCloud_version)
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	implementation "org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.3.1.RELEASE"
+	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+
+	implementation 'com.nimbusds:nimbus-jose-jwt:6.7'
+	
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+//    testImplementation 'org.springframework.security:spring-security-test'
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}
+
+test {
+	useJUnitPlatform()
+}
