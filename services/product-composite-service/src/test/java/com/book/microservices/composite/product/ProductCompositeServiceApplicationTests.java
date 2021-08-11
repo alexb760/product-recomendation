@@ -32,7 +32,11 @@ import reactor.core.publisher.Flux;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
     webEnvironment = RANDOM_PORT,
-    properties = {"spring.data.mongodb.port: 0", "eureka.client.enabled=false"})
+    classes = {ProductCompositeServiceApplication.class, TestSecurityConfig.class },
+    properties = {
+        "spring.main.allow-bean-definition-overriding=true",
+        "spring.data.mongodb.port: 0",
+        "eureka.client.enabled=false"})
 class ProductCompositeServiceApplicationTests {
 
   private static final int PRODUCT_ID_OK = 1;

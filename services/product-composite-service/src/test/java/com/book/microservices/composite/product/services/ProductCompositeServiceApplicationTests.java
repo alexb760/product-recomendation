@@ -9,6 +9,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import com.book.api.core.product.Product;
 import com.book.api.core.recomendation.Recommendation;
 import com.book.api.core.review.Review;
+import com.book.microservices.composite.product.ProductCompositeServiceApplication;
+import com.book.microservices.composite.product.TestSecurityConfig;
 import com.book.util.exception.InvalidInputException;
 import com.book.util.exception.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +28,11 @@ import reactor.core.publisher.Mono;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
     webEnvironment = RANDOM_PORT,
-    properties = {"spring.data.mongodb.port: 0", "eureka.client.enabled=false"})
+    classes = {ProductCompositeServiceApplication.class, TestSecurityConfig.class },
+    properties = {
+        "spring.main.allow-bean-definition-overriding=true",
+        "spring.data.mongodb.port: 0",
+        "eureka.client.enabled=false"})
 public class ProductCompositeServiceApplicationTests {
 
   private static final int PRODUCT_ID_OK = 1;

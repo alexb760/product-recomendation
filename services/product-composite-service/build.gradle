@@ -1,8 +1,8 @@
 plugins {
 //	id 'org.springframework.boot' version '2.4.5'
-	id 'org.springframework.boot'
-	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-	id 'java'
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
 }
 
 group = 'com.book.microservices.composite.product'
@@ -10,56 +10,59 @@ version = app_version
 sourceCompatibility = '14'
 
 ext {
-	springCloudVersion = springCloud_version
+    springCloudVersion = springCloud_version
 }
 
 repositories {
-	mavenCentral()
-	//Special repository to springFox
+    mavenCentral()
+    //Special repository to springFox
 //	maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local/' }
 }
 
 dependencies {
-	implementation project(':api')
-	implementation project(':util')
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springframework.boot:spring-boot-starter-webflux'
-	compileOnly 'org.projectlombok:lombok:1.18.20'
-	annotationProcessor 'org.projectlombok:lombok:1.18.20'
-	//Implementation of openAPI with springFox
-	//Implements documentation for the annotated interface
+    implementation project(':api')
+    implementation project(':util')
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    compileOnly 'org.projectlombok:lombok:1.18.20'
+    annotationProcessor 'org.projectlombok:lombok:1.18.20'
+    implementation('org.springframework.boot:spring-boot-starter-security')
+    implementation('org.springframework.security:spring-security-oauth2-resource-server')
+    implementation('org.springframework.security:spring-security-oauth2-jose')
+    //Implementation of openAPI with springFox
+    //Implements documentation for the annotated interface
 // https://mvnrepository.com/artifact/io.springfox/springfox-swagger2
-	implementation group: 'io.springfox', name: 'springfox-swagger2', version: '3.0.0'
+    implementation group: 'io.springfox', name: 'springfox-swagger2', version: '3.0.0'
 
-	//Enables UI
+    //Enables UI
 // https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui
-	implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '3.0.0'
+    implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '3.0.0'
 
-	// https://mvnrepository.com/artifact/io.springfox/springfox-boot-starter
-	implementation group: 'io.springfox', name: 'springfox-boot-starter', version: '3.0.0'
+    // https://mvnrepository.com/artifact/io.springfox/springfox-boot-starter
+    implementation group: 'io.springfox', name: 'springfox-boot-starter', version: '3.0.0'
 
-	implementation('org.springframework.cloud:spring-cloud-starter-stream-rabbit')
-	implementation('org.springframework.cloud:spring-cloud-starter-stream-kafka')
+    implementation('org.springframework.cloud:spring-cloud-starter-stream-rabbit')
+    implementation('org.springframework.cloud:spring-cloud-starter-stream-kafka')
 
-	implementation('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
+    implementation('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
 
-	// Enables reactive support
-	implementation('io.springfox:springfox-spring-webflux:3.0.0')
+    // Enables reactive support
+    implementation('io.springfox:springfox-spring-webflux:3.0.0')
 
-	testCompileOnly 'org.projectlombok:lombok:1.18.20'
-	testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation('org.springframework.cloud:spring-cloud-stream-test-support')
-	testImplementation 'io.projectreactor:reactor-test'
-	testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
+    testCompileOnly 'org.projectlombok:lombok:1.18.20'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation('org.springframework.cloud:spring-cloud-stream-test-support')
+    testImplementation 'io.projectreactor:reactor-test'
+    testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
 }
 
 dependencyManagement {
-	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-	}
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
 }
 
 test {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }

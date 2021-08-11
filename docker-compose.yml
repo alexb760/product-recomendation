@@ -45,18 +45,6 @@ services:
       rabbitmq:
         condition: service_healthy
 
-# Since we are implementing age Service we do not need to expose this service directly.
-# now our gateway will take care of
-  gateway:
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-    build: spring-cloud/gateway
-    mem_limit: 350m
-    ports:
-      - "8443:8443"
-    networks:
-      - microservices
-
   product-composite:
     build: services/product-composite-service
     mem_limit: 350m
@@ -76,11 +64,25 @@ services:
     networks:
       - microservices
 
+  # Since we are implementing age Service we do not need to expose this service directly.
+  # now our gateway will take care of
+  gateway:
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    build: spring-cloud/gateway
+    mem_limit: 350m
+    ports:
+      - "8443:8443"
+    networks:
+      - microservices
+
   auth-server:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     build: spring-cloud/authorization-server
     mem_limit: 350m
+    networks:
+      - microservices
 
   # $ mongo
   mongodb:
