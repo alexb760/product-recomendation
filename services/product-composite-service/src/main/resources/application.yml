@@ -48,6 +48,7 @@ app:
   eureka-server: localhost
   auth-server: localhost
 
+spring.security.oauth2.resourceserver.jwt.jwk-set-uri: http://auth-server:9999/.well-known/jwks.json
 #Eureka client configuration.
 eureka:
   client:
@@ -62,16 +63,6 @@ eureka:
 ribbon.ServerListRefreshInterval: 5000
 ribbon.NFLoadBalancerPingInterval: 5
 
-#app:
-#  product-service:
-#    host: localhost
-#    port: 7001
-#  recommendation-service:
-#    host: localhost
-#    port: 7002
-#  review-service:
-#    host: localhost
-#    port: 7003
 
 # *************** Kafka and RabbitNQ ******************#
 spring.cloud.stream:

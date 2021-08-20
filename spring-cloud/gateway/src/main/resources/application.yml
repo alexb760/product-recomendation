@@ -87,6 +87,7 @@ spring.cloud.gateway.routes:
       - SetPath=/501
 
 spring.security.oauth2.resourceserver.jwt.jwk-set-uri: http://${app.auth-server}:9999/.well-known/jwks.json
+spring.security.oauth2.client.provider.okta.issuer-uri: http://${app.auth-server}:9999/oauth2/default
 
 management.endpoint.health.show-details: "ALWAYS"
 management.endpoints.web.exposure.include: "*"

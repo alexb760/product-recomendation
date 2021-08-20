@@ -21,6 +21,7 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 
 @TestConfiguration(value = "springSecurityFilterChain1")
 public class TestSecurityConfig {
+
  @Bean
  public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
   http.csrf().disable().authorizeExchange().anyExchange().permitAll();
