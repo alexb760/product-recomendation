@@ -1,0 +1,14 @@
+# Implicit Grant Flow.
+# this method is quite insecure not recomended for production env.
+#
+# from the browser:
+# https://localhost:8443/oauth/authorize?response_type=token&client_id=reader&redirect_uri=http://my.redirect.uri&scope=product:read&state=48532
+# response.
+# http://my.redirect.uri/#access_token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYWdudXMiLCJleHAiOjIyMjk5NDU4NTMsImF1dGhvcml0aWVzIjpbIlJPTEVfVVNFUiJdLCJqdGkiOiJFYnpaayszOThkeEQ2U3pLdGdyNVBZdkhrK0E9IiwiY2xpZW50X2lkIjoicmVhZGVyIiwic2NvcGUiOlsicHJvZHVjdDpyZWFkIl19.NzcnkPeMv-AILYaM5gHmC5mFDwrvpiSE6Q7grvZ52i68zHtoCGLkZvh8-oWHFL-5WMDjVwJxTTjyjFPYaAEJeOtL-uqegxU4wSq5ZazblC8IFE4a9NKQHcJFwO-LSlr6BRiuy9e9dgbPm_ofeQD_ud46-la98ZkXK7Z3VU7GWW-pCbPL8jTxqkbgd3dKfIOBei5YF0LrTEHvU5LhHTrcLDbw9FCH_QJSPm4_ppwZWlPby0Fbcx-4UcUmyjud-OpkIaMhsMItpARhefRKSZVnpbh0UHKVrdQW3ATixMnCjyTNw-FF6p37R-5QYvl_SHWTPfZDsRa-w67U02MiOLZOeQ&token_type=bearer&state=48532&expires_in=599999999&jti=EbzZk+398dxD6SzKtgr5PYvHk+A=
+
+ACCESS_TOKEN=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYWdudXMiLCJleHAiOjIyMjk5NDU4NTMsImF1dGhvcml0aWVzIjpbIlJPTEVfVVNFUiJdLCJqdGkiOiJFYnpaayszOThkeEQ2U3pLdGdyNVBZdkhrK0E9IiwiY2xpZW50X2lkIjoicmVhZGVyIiwic2NvcGUiOlsicHJvZHVjdDpyZWFkIl19.NzcnkPeMv-AILYaM5gHmC5mFDwrvpiSE6Q7grvZ52i68zHtoCGLkZvh8-oWHFL-5WMDjVwJxTTjyjFPYaAEJeOtL-uqegxU4wSq5ZazblC8IFE4a9NKQHcJFwO-LSlr6BRiuy9e9dgbPm_ofeQD_ud46-la98ZkXK7Z3VU7GWW-pCbPL8jTxqkbgd3dKfIOBei5YF0LrTEHvU5LhHTrcLDbw9FCH_QJSPm4_ppwZWlPby0Fbcx-4UcUmyjud-OpkIaMhsMItpARhefRKSZVnpbh0UHKVrdQW3ATixMnCjyTNw-FF6p37R-5QYvl_SHWTPfZDsRa-w67U02MiOLZOeQ
+
+curl https://localhost:8443/product-composite/2 -k -H "Authorization: Bearer $ACCESS_TOKEN" -i 
+
+# Writer
+# https://localhost:8443/oauth/authorize?response_type=token&client_id=writer&redirect_uri=http://my.redirect.uri&scope=product:read+product:write&state=95372

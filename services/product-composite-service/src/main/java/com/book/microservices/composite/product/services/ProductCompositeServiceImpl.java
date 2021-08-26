@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
@@ -20,6 +23,8 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @RestController
 public class ProductCompositeServiceImpl implements ProductCompositeService {
+
+//  private final SecurityContext nullSC = new SecurityContextImpl();
 
   private final ServiceUtil serviceUtil;
   private ProductCompositeIntegration integration;
@@ -92,7 +97,8 @@ public class ProductCompositeServiceImpl implements ProductCompositeService {
             (List<Recommendation>) values[1],
             (List<Review>) values[2],
             serviceUtil.getServiceAddress()),
-        integration.getProduct(productId),
+//            ReactiveSecurityContextHolder.getContext().defaultIfEmpty(nullSC),
+            integration.getProduct(productId),
         integration.getRecommendations(productId).collectList(),
         integration.getReviews(productId).collectList())
         .doOnError(ex -> log.warn("getCompositeProduct failed: {}", ex.toString()))

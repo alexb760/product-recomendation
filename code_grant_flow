@@ -1,0 +1,27 @@
+# gets the code grant flow
+# https://localhost:8443/oauth/authorize?response_type=code&client_id=reader&redirect_uri=http://my.redirect.uri&scope=product:read&state=35725
+# response: 
+# http://my.redirect.uri/?code=5-wRIK&state=35725
+#
+#Test invalid token:
+ACCESS_TOKEN=invalid-token
+curl https://localhost:8443/product-composite/2 -k -H "Authorization: Bearer $ACCESS_TOKEN" -i  
+# expected an 401 error
+#
+#correct token.
+
+# Code can be used only once. it may need to be regenerated again.
+CODE=5-wRIK
+
+# The whole idea is to exchange the code to actualy a correct access_token
+ACCESS_TOKEN=$(curl -k https://reader:secret@localhost:8443/oauth/token \
+ -d grant_type=authorization_code \
+ -d client_id=reader \
+ -d redirect_uri=http://my.redirect.uri \
+ -d code=$CODE -s | jq .access_token -r)
+
+echo $ACCESS_TOKEN
+
+# Expected a 200 success messages.
+curl https://localhost:8443/product-composite/2 -k -H "Authorization: Bearer $ACCESS_TOKEN" -i  
+
