@@ -86,7 +86,7 @@ spring.cloud.gateway.routes:
     filters:
       - SetPath=/501
 
-spring.security.oauth2.resourceserver.jwt.jwk-set-uri: http://${app.auth-server}:9999/.well-known/jwks.json
+spring.security.oauth2.resourceserver.jwt.jwk-set-uri: https://dev-madlab.us.auth0.com/.well-known/jwks.json
 spring.security.oauth2.client.provider.okta.issuer-uri: http://${app.auth-server}:9999/oauth2/default
 
 management.endpoint.health.show-details: "ALWAYS"

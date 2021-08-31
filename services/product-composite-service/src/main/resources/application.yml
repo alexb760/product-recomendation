@@ -48,7 +48,7 @@ app:
   eureka-server: localhost
   auth-server: localhost
 
-spring.security.oauth2.resourceserver.jwt.jwk-set-uri: http://auth-server:9999/.well-known/jwks.json
+spring.security.oauth2.resourceserver.jwt.jwk-set-uri: https://dev-madlab.us.auth0.com/.well-known/jwks.json
 #Eureka client configuration.
 eureka:
   client:

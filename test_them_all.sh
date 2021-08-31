@@ -189,7 +189,15 @@ then
 fi
 
 waitForService curl -k https://$HOST:$PORT/actuator/health
-ACCESS_TOKEN=$(curl -k https://writer:secret@$HOST:$PORT/oauth/token -d grant_type=password -d username=magnus -d password=password -s | jq .access_token -r)
+#ACCESS_TOKEN=$(curl -k https://writer:secret@$HOST:$PORT/oauth/token -d grant_type=password -d username=magnus -d password=password -s | jq .access_token -r)
+# Implementing Open Connect Id
+echo "try ${TENANT_DOMAIN_NAME} and ${USER_EMAIL} and ${CLIENT_ID}"
+ACCESS_TOKEN=$(curl --request POST \
+ --url "${TENANT_DOMAIN_NAME}" \
+ --header 'content-type: application/json' \
+ --data "$BODY_DATA" | jq -r .access_token)
+ #--data '{"grant_type":"password", "username":"${USER_EMAIL}", "password":"${USER_PASSWORD}", "audience":"https://localhost:8443/product-composite", "scope":"openid email product:read product:write", "client_id": "${CLIENT_ID}", "client_secret": "${CLIENT_SECRET}"}' -s | jq -r .access_token)
+echo "we got token ${ACCESS_TOKEN}"
 AUTH="-H \"Authorization: Bearer $ACCESS_TOKEN\""
 
 setupTestdata
@@ -229,7 +237,13 @@ assertEqual "\"Type mismatch.\"" "$(echo $RESPONSE | jq .message)"
 assertCurl 401 "curl -k https://$HOST:$PORT/product-composite/$PROD_ID_REVS_RECS -s"
 
 # Verify that the reader - client with only read scope can call the read API but not delete API.
-READER_ACCESS_TOKEN=$(curl -k https://reader:secret@$HOST:$PORT/oauth/token -d grant_type=password -d username=magnus -d password=password -s | jq .access_token -r)
+#EADER_ACCESS_TOKEN=$(curl -k https://reader:secret@$HOST:$PORT/oauth/token -d grant_type=password -d username=magnus -d password=password -s | jq .access_token -r)
+
+READER_ACCESS_TOKEN=$(curl --request POST \
+ --url 'https://${TENANT_DOMAIN_NAME}/oauth/token' \
+ --header 'content-type: application/json' \
+ --data '{"grant_type":"password", "username":"${USER_EMAIL}", "password":"${USER_PASSWORD}", "audience":"https://localhost:8443/product-composite", "scope":"openid email product:read", "client_id": "${CLIENT_ID}", "client_secret": "${CLIENT_SECRET}"}' -s | jq -r .access_token)
+
 READER_AUTH="-H \"Authorization: Bearer $READER_ACCESS_TOKEN\""
 
 assertCurl 200 "curl -k https://$HOST:$PORT/product-composite/$PROD_ID_REVS_RECS $READER_AUTH -s"
