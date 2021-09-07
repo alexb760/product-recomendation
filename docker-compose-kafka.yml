@@ -130,19 +130,29 @@ services:
       kafka:
         condition: service_started
 
+  # Eureka server - discovery service patter
+  eureka:
+    build: spring-cloud/eureka-server
+    mem_limit: 350m
+
   # Since we are implementing age Service we do not need to expose this service directly.
   # now our gateway will take care of
   gateway:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+      - SERVER_SSL_KEY_STORE=file:/keystore/edge-test.p12
+      - SERVER_SSL_KEY_STORE_PASSWORD=testtest
+    volumes:
+      - $PWD/keystore:/keystore
     build: spring-cloud/gateway
     mem_limit: 350m
     ports:
-      - "8080:8080"
+      - "8443:8443"
 
-  # Eureka server - discovery service patter
-  eureka:
-    build: spring-cloud/eureka-server
+  auth-server:
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    build: spring-cloud/authorization-server
     mem_limit: 350m
 
   # $ mongo
