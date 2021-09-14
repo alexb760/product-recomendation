@@ -23,7 +23,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
     webEnvironment = RANDOM_PORT,
-    properties = {"spring.datasource.url=jdbc:h2:mem:review-db", "eureka.client.enabled=false"})
+    properties = {"spring.datasource.url=jdbc:h2:mem:review-db", "eureka.client.enabled=false", "spring.cloud.config.enabled=false"})
 class ReviewServiceApplicationTests {
 
   @Autowired private WebTestClient client;

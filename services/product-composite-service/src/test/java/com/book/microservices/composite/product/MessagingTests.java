@@ -37,8 +37,12 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-    classes = {ProductCompositeServiceApplication.class, TestSecurityConfig.class },
-    properties = {"spring.main.allow-bean-definition-overriding=true","eureka.client.enabled=false"})
+    classes = {ProductCompositeServiceApplication.class, TestSecurityConfig.class},
+    properties = {
+      "spring.main.allow-bean-definition-overriding=true",
+      "eureka.client.enabled=false",
+      "spring.cloud.config.enabled=false"
+    })
 public class MessagingTests {
 
   private static final int PRODUCT_ID_OK = 1;

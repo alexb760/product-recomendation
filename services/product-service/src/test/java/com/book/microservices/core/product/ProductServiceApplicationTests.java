@@ -36,7 +36,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
     webEnvironment = RANDOM_PORT,
-    properties = {"spring.data.mongodb.port: 0", "eureka.client.enabled=false"})
+    properties = {"spring.data.mongodb.port: 0", "eureka.client.enabled=false", "spring.cloud.config.enabled=false"})
 class ProductServiceApplicationTests {
 
   @Autowired private WebTestClient client;

@@ -20,7 +20,7 @@ import reactor.test.StepVerifier;
 /**
  * @author Alexander Bravo
  */
-@DataMongoTest()
+@DataMongoTest(properties = "spring.cloud.config.enabled=false")
 @ExtendWith({SpringExtension.class})
 public class PersistenceTest {
 

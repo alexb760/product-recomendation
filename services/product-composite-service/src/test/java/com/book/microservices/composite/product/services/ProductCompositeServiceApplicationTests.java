@@ -32,7 +32,8 @@ import reactor.core.publisher.Mono;
     properties = {
         "spring.main.allow-bean-definition-overriding=true",
         "spring.data.mongodb.port: 0",
-        "eureka.client.enabled=false"})
+        "eureka.client.enabled=false",
+         "spring.cloud.config.enabled=false"})
 public class ProductCompositeServiceApplicationTests {
 
   private static final int PRODUCT_ID_OK = 1;

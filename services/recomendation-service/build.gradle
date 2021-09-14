@@ -1,8 +1,8 @@
 plugins {
 //	id 'org.springframework.boot' version '2.4.5'
-	id 'org.springframework.boot'
-	id 'io.spring.dependency-management'
-	id 'java'
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
+    id 'java'
 }
 
 group = 'com.book.microservices.core.recommendation'
@@ -10,47 +10,51 @@ version = app_version
 sourceCompatibility = '14'
 
 ext {
-	mapstructVersion = "1.4.1.Final"
-	springCloudVersion = springCloud_version
+    mapstructVersion = "1.4.1.Final"
+    springCloudVersion = springCloud_version
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation project(':api')
-	implementation project(':util')
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springframework.boot:spring-boot-starter-webflux'
-	compileOnly 'org.projectlombok:lombok:1.18.20'
-	annotationProcessor 'org.projectlombok:lombok:1.18.20'
+    implementation project(':api')
+    implementation project(':util')
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    compileOnly 'org.projectlombok:lombok:1.18.20'
+    annotationProcessor 'org.projectlombok:lombok:1.18.20'
 //	implementation('org.springframework.boot:spring-boot-starter-data-mongodb')
-	implementation('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
-	implementation('org.springframework.cloud:spring-cloud-starter-stream-rabbit')
-	implementation('org.springframework.cloud:spring-cloud-starter-stream-kafka')
-	//Eureka-client
-	implementation('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
-	implementation("org.mapstruct:mapstruct:${mapstructVersion}")
+    implementation('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
+    implementation('org.springframework.cloud:spring-cloud-starter-stream-rabbit')
+    implementation('org.springframework.cloud:spring-cloud-starter-stream-kafka')
 
-	compileOnly "org.mapstruct:mapstruct-processor:${mapstructVersion}"
-	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
-	testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    implementation('org.springframework.cloud:spring-cloud-starter-config')
+    implementation('org.springframework.retry:spring-retry')
 
-	testCompileOnly 'org.projectlombok:lombok:1.18.20'
-	testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation('org.springframework.cloud:spring-cloud-stream-test-support')
-	testImplementation 'io.projectreactor:reactor-test'
-	testImplementation('de.flapdoodle.embed:de.flapdoodle.embed.mongo')
+    //Eureka-client
+    implementation('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
+    implementation("org.mapstruct:mapstruct:${mapstructVersion}")
+
+    compileOnly "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+
+    testCompileOnly 'org.projectlombok:lombok:1.18.20'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation('org.springframework.cloud:spring-cloud-stream-test-support')
+    testImplementation 'io.projectreactor:reactor-test'
+    testImplementation('de.flapdoodle.embed:de.flapdoodle.embed.mongo')
 }
 
 dependencyManagement {
-	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-	}
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
 }
 
 test {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }

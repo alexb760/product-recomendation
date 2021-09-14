@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Alexander Bravo
  */
 @ExtendWith(SpringExtension.class)
-@DataJpaTest
+@DataJpaTest(properties = "spring.cloud.config.enabled=false")
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 public class PersistenceTest {
 
