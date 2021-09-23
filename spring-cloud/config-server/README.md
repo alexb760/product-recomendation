@@ -35,7 +35,7 @@
        CONFIG_SERVER_USR=dev-usr
        CONFIG_SERVER_PWD=dev-pwd ````
 * ***Configuring clients of a config server:*** To be able to reach the config server below the required steps.
-  1. add ``spring-cloud-starter-config, spring-retry `` dependencies.
+  1. add ``spring-cloud-starter-config, spring-retry `` dependencies to all service.
   2. Move the configuration file, ``application.yml``, to the config repository and rename it 
      to the name of the client as specified by the property, ``spring.application.name``.
   3. Add a file named ``bootstrap.yml`` to the ``src/main/resources`` folder. This file holds the configuration required to connect to the config server.
