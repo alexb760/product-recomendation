@@ -47,6 +47,12 @@
        - CONFIG_SERVER_PWD=${CONFIG_SERVER_PWD}
   ````
   5. Disable config-server from automated test ``@SpringBootTest(webEnvironment=RANDOM_PORT, properties = {"eureka.client.enabled=false", "spring.cloud.config.enabled=false"})``
+  6. Fixing Unit test: after add config server couple of things can go bad.
+    * when we use swagger as a API documentation, and we have moved ``properties.yml`` some properties will not be available anymore
+      so, then we can create a ``test/sources/test.properties`` files mentioning those special properties we need
+      see [test.properties](../../services/product-composite-service/src/test/resources/test.properties)
+    * After creating our ``Test.properties`` we can reference with annotation `@TestPropertySource("classpath:/test.property")`
+    * A different method could be passing as parameter inside annotation `@SpringBootTest(propertie={})` comma separated
 
 
 ### Guides

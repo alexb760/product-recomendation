@@ -30,6 +30,7 @@ import org.springframework.cloud.stream.test.binder.MessageCollector;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -43,6 +44,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
       "eureka.client.enabled=false",
       "spring.cloud.config.enabled=false"
     })
+@TestPropertySource("classpath:/test.properties")
 public class MessagingTests {
 
   private static final int PRODUCT_ID_OK = 1;

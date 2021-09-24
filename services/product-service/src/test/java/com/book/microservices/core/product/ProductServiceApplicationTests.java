@@ -36,7 +36,12 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
     webEnvironment = RANDOM_PORT,
-    properties = {"spring.data.mongodb.port: 0", "eureka.client.enabled=false", "spring.cloud.config.enabled=false"})
+    properties = {
+      "spring.data.mongodb.port: 0",
+      "eureka.client.enabled=false",
+      "spring.cloud.config.enabled=false",
+      "server.error.include-message=always"
+    })
 class ProductServiceApplicationTests {
 
   @Autowired private WebTestClient client;
@@ -92,18 +97,6 @@ class ProductServiceApplicationTests {
         fail("Expected a InvalidInputException as the root cause!");
       }
     }
-
-//    int productId = 1;
-//
-//    Product product = new Product(productId, "Name " + productId, productId, "SA");
-//    productService.createProduct(product);
-//    assertNotNull(repository.findByProductId(productId).block());
-//
-//    postAndVerifyProduct(productId, UNPROCESSABLE_ENTITY)
-//        .jsonPath("$.path")
-//        .isEqualTo("/product")
-//        .jsonPath("$.message")
-//        .isEqualTo("Duplicate key, Product Id: " + productId);
   }
 
   @Test

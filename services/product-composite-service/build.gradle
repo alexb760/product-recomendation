@@ -30,6 +30,8 @@ dependencies {
     implementation('org.springframework.security:spring-security-oauth2-resource-server')
     implementation('org.springframework.security:spring-security-oauth2-jose')
 
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.0.3'
+
     implementation('org.springframework.cloud:spring-cloud-starter-config')
     implementation('org.springframework.retry:spring-retry')
 

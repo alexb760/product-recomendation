@@ -19,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
@@ -34,6 +35,7 @@ import reactor.core.publisher.Mono;
         "spring.data.mongodb.port: 0",
         "eureka.client.enabled=false",
          "spring.cloud.config.enabled=false"})
+@TestPropertySource("classpath:/test.properties")
 public class ProductCompositeServiceApplicationTests {
 
   private static final int PRODUCT_ID_OK = 1;

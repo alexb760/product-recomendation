@@ -79,7 +79,7 @@ server.port: 8080
 spring.rabbitmq.host: rabbitmq
 spring.cloud.stream.kafka.binder.brokers: kafka
 app.eureka-server: eureka
-# We are passing this properties directly from composer files
+# We are moving these properties directly to composer files
 #spring:
 #  cloud:
 #    stream:

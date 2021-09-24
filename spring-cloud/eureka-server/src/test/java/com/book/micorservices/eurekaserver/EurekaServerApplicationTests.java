@@ -11,10 +11,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+/**
+ * , properties = { "spring.cloud.config.enabled=false", "app.eureka-username=u",
+ * "app.eureka-password=p", "management.endpoints.web.exposure.include=*"
+ */
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(webEnvironment = RANDOM_PORT, properties = "spring.cloud.config.enabled=false")
+@SpringBootTest(webEnvironment = RANDOM_PORT)
+@TestPropertySource("classpath:/test.properties")
 class EurekaServerApplicationTests {
 
   @Test
