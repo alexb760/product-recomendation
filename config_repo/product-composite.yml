@@ -102,7 +102,9 @@ management.endpoint.health.show-details: "ALWAYS"
 management.endpoints.web.exposure.include: "*"
 
 ---
-spring.profiles: docker
+config:
+  activate:
+    on-profile: docker
 server.port: 8080
 app:
   eureka-server: eureka

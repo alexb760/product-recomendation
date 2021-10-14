@@ -29,7 +29,9 @@ management.endpoint.health.show-details: "ALWAYS"
 management.endpoints.web.exposure.include: "*"
 
 ---
-spring.profiles: docker
+config:
+  activate:
+    on-profile: docker
 
 spring.rabbitmq.host: rabbitmq
 

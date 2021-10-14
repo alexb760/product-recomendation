@@ -23,6 +23,8 @@ management.endpoints.web.exposure.include: "*"
 # security.oauth2.authorizationserver.jwt.enabled: false
 
 ---
-spring.profiles: docker
+config:
+  activate:
+    on-profile: docker
 
 app.eureka-server: eureka

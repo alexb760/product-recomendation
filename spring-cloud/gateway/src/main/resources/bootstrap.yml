@@ -11,7 +11,17 @@ spring:
       maxAttempts: 20
     uri: http://${CONFIG_SERVER_USR}:${CONFIG_SERVER_PWD}@${app.config-server}:8888
 
+app:
+  auth-server: localhost
+
+spring.security.oauth2.resourceserver.jwt.jwk-set-uri: http://${app.auth-server}:9999/.well-known/jwks.json
+spring.security.oauth2.client.provider.okta.issuer-uri: http://${app.auth-server}:9999/oauth2/default
+
 ---
-spring.profiles: docker
+spring:
+  config:
+    activate:
+      on-profile: docker
 
 app.config-server: config-server
+

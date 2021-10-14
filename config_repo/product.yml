@@ -71,7 +71,9 @@ management.endpoints.web.exposure.include: "*"
 # that means when we run our application with profile 'docker' it will overwrite previous one
 # server.port: 7001
 ---
-spring.profiles: docker
+config:
+  activate:
+    on-profile: docker
 
 spring.data.mongodb.host: mongodb
 server.port: 8080

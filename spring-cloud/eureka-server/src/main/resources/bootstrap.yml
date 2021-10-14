@@ -9,9 +9,13 @@ spring:
       multiplier: 1.3
       maxInterval: 10000
       maxAttempts: 20
-    uri: http://${CONFIG_SERVER_USR}:${CONFIG_SERVER_PWD}@${app.config-server}:8888
+    uri: http://dev-usr:dev-pwd@${app.config-server}:8888
+#    uri: http://${CONFIG_SERVER_USR}:${CONFIG_SERVER_PWD}@${app.config-server}:8888
 
 ---
-spring.profiles: docker
+spring:
+  config:
+    activate:
+      on-profile: docker
 
 app.config-server: config-server

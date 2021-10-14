@@ -48,6 +48,7 @@ dependencies {
 
     //Eureka-client
     implementation('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.0.3'
 
     implementation("org.mapstruct:mapstruct:${mapstructVersion}")
 

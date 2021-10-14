@@ -66,7 +66,9 @@ management.endpoint.health.show-details: "ALWAYS"
 management.endpoints.web.exposure.include: "*"
 
 ---
-spring.profiles: docker
+config:
+  activate:
+    on-profile: docker
 spring.data.mongodb.host: mongodb
 server.port: 8080
 #eureka.client.serviceUrl.defaultZone: http://eureka:8761/eureka/

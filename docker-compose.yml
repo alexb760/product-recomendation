@@ -11,6 +11,8 @@ services:
     mem_limit: 350m
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+      - CONFIG_SERVER_USR=${CONFIG_SERVER_USR}
+      - CONFIG_SERVER_PWD=${CONFIG_SERVER_PWD}
     networks:
       - microservices
     depends_on:
@@ -24,6 +26,8 @@ services:
     mem_limit: 350m
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+      - CONFIG_SERVER_USR=${CONFIG_SERVER_USR}
+      - CONFIG_SERVER_PWD=${CONFIG_SERVER_PWD}
     networks:
       - microservices
     depends_on:
@@ -37,6 +41,8 @@ services:
     mem_limit: 350m
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+      - CONFIG_SERVER_USR=${CONFIG_SERVER_USR}
+      - CONFIG_SERVER_PWD=${CONFIG_SERVER_PWD}
     networks:
       - microservices
     depends_on:
@@ -51,6 +57,8 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
 #      - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+      - CONFIG_SERVER_USR=${CONFIG_SERVER_USR}
+      - CONFIG_SERVER_PWD=${CONFIG_SERVER_PWD}
     networks:
       - microservices
     depends_on:
@@ -59,7 +67,12 @@ services:
 
   # Eureka server - discovery service patter
   eureka:
+    container_name: eureka
     build: spring-cloud/eureka-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - CONFIG_SERVER_USR=${CONFIG_SERVER_USR}
+      - CONFIG_SERVER_PWD=${CONFIG_SERVER_PWD}
     mem_limit: 350m
     networks:
       - microservices
@@ -67,10 +80,13 @@ services:
   # Since we are implementing age Service we do not need to expose this service directly.
   # now our gateway will take care of
   gateway:
+    container_name: gateway
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - SERVER_SSL_KEY_STORE=file:/keystore/edge-test.p12
       - SERVER_SSL_KEY_STORE_PASSWORD=testtest
+      - CONFIG_SERVER_USR=${CONFIG_SERVER_USR}
+      - CONFIG_SERVER_PWD=${CONFIG_SERVER_PWD}
     volumes:
       - $PWD/keystore:/keystore
     build: spring-cloud/gateway
@@ -81,8 +97,11 @@ services:
       - microservices
 
   auth-server:
+    container_name: auth-server
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+      - CONFIG_SERVER_USR=${CONFIG_SERVER_USR}
+      - CONFIG_SERVER_PWD=${CONFIG_SERVER_PWD}
     build: spring-cloud/authorization-server
     mem_limit: 350m
     networks:
@@ -102,14 +121,19 @@ services:
       - SPRING_SECURITY_USER_NAME=${CONFIG_SERVER_USR}
       - SPRING_SECURITY_USER_PASSWORD=${CONFIG_SERVER_PWD}
     volumes:
-      - $PWD/config-repo:/config-repo
+      - $PWD/config_repo:/config_repo
     build: spring-cloud/config-server
+    networks:
+      - microservices
 #    mem_limit: 350m -> docker-compose < 3.0
 
   # $ mongo
   mongodb:
     image: mongo:3.6.9
-    mem_limit: 350m
+    deploy:
+      resources:
+        limits:
+          memory: 350M
     ports:
       - "27017:27017"
     healthcheck:
@@ -124,7 +148,10 @@ services:
   # $ mysql -uroot -h127.0.0.1 -p
   mysql:
     image: mysql:5.7
-    mem_limit: 350m
+    deploy:
+      resources:
+        limits:
+          memory: 350M
     ports:
       - "3306:3306"
     environment:
@@ -143,7 +170,10 @@ services:
   rabbitmq:
     image: rabbitmq:3.8-management
     container_name: rabbit_mq
-    mem_limit: 350m
+    deploy:
+      resources:
+        limits:
+          memory: 350M
     ports:
       - 5672:5672
       - 15672:15672

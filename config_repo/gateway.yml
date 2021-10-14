@@ -9,13 +9,13 @@ server.ssl:
   key-store-password: password
   key-alias: localhost
 
-app:
-  eureka-username: u
-  eureka-password: p
-  eureka-server: localhost
-  auth-server: localhost
-
-app.eureka-server: localhost
+#app:
+#  eureka-username: u
+#  eureka-password: p
+#  eureka-server: localhost
+#  auth-server: localhost
+#app.eureka-server: localhost
+app.config-server: localhost
 
 eureka:
   client:
@@ -106,8 +106,10 @@ logging:
     org.springframework.cloud.gateway: TRACE
     org.springframework.web.server.adapter.HttpWebHandlerAdapter: TRACE
 ---
-spring.profiles: docker
+config:
+  activate:
+    on-profile: docker
 
 app:
   eureka-server: eureka
-  auth-server: auth-server
+  config-server: config-server
