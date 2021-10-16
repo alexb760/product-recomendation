@@ -34,7 +34,6 @@ config:
     on-profile: docker
 
 spring.rabbitmq.host: rabbitmq
-
 spring.cloud.stream.kafka.binder.brokers: kafka
 
 app:

@@ -1,5 +1,4 @@
 api:
-
   common:
     version: 1.0.0
     title: Sample API
@@ -40,28 +39,21 @@ api:
 
 server.port: 7000
 server.error.include-message: always
-#spring.application.name: product-composite
-
-app:
-  eureka-username: u
-  eureka-password: p
-  eureka-server: localhost
-  auth-server: localhost
-
-spring.security.oauth2.resourceserver.jwt.jwk-set-uri: http://auth-server:9999/.well-known/jwks.json
-#Eureka client configuration.
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: "http://${app.eureka-username}:${app.eureka-password}@${app.eureka-server}:8761/eureka/"
-    initialInstanceInfoReplicationIntervalSeconds: 5
-    registryFetchIntervalSeconds: 5
-  instance:
-    leaseRenewalIntervalInSeconds: 5
-    leaseExpirationDurationInSeconds: 5
 
 ribbon.ServerListRefreshInterval: 5000
 ribbon.NFLoadBalancerPingInterval: 5
+
+spring.security.oauth2.resourceserver.jwt.jwk-set-uri: http://auth-server:9999/.well-known/jwks.json
+#Eureka client configuration.
+#eureka:
+#  client:
+#    serviceUrl:
+#      defaultZone: "http://${app.eureka-username}:${app.eureka-password}@${app.eureka-server}:8761/eureka/"
+#    initialInstanceInfoReplicationIntervalSeconds: 5
+#    registryFetchIntervalSeconds: 5
+#  instance:
+#    leaseRenewalIntervalInSeconds: 5
+#    leaseExpirationDurationInSeconds: 5
 
 
 # *************** Kafka and RabbitNQ ******************#
@@ -82,42 +74,50 @@ spring.cloud.stream:
       producer:
         required-groups: auditGroup
 
-spring.cloud.stream.kafka.binder:
-  brokers: 127.0.0.1
-  defaultBrokerPort: 9092
-
-spring.rabbitmq:
-  host: 127.0.0.1
-  port: 5672
-  username: guest
-  password: guest
+#spring.cloud.stream.kafka.binder:
+#  brokers: 127.0.0.1
+#  defaultBrokerPort: 9092
+#
+#spring.rabbitmq:
+#  host: 127.0.0.1
+#  port: 5672
+#  username: guest
+#  password: guest
   # *************** Kafka and RabbitNQ ******************#
 
 logging:
   level:
     root: INFO
-    se.magnus: DEBUG
-
-management.endpoint.health.show-details: "ALWAYS"
-management.endpoints.web.exposure.include: "*"
+    com.book.microservices: DEBUG
+    org.springframework.web.server.adapter.HttpWebHandlerAdapter: TRACE
 
 ---
 config:
   activate:
     on-profile: docker
 server.port: 8080
-app:
-  eureka-server: eureka
-  auth-server: auth-server
 
-spring.rabbitmq.host: rabbitmq
-spring.cloud.stream.kafka.binder.brokers: kafka
-# We are passing this properties directly from composer files
-#spring:
-#  cloud:
-#    stream:
-#      kafka:
-#        binder:
-#          autoAddPartitions: true
-#          minPartitionCount: 4
-#          replicationFactor: 1
+#---
+#config:
+#  activate:
+#    on-profile: streaming_partitioned
+#
+#spring.cloud.stream.bindings.output-products.producer:
+#  partition-key-expression: payload.key
+#  partition-count: 2
+#
+#spring.cloud.stream.bindings.output-recommendations.producer:
+#  partition-key-expression: payload.key
+#  partition-count: 2
+#
+#spring.cloud.stream.bindings.output-reviews.producer:
+#  partition-key-expression: payload.key
+#  partition-count: 2
+#
+#---
+#config:
+#  activate:
+#    on-profile: kafka
+#
+#management.health.rabbit.enabled: false
+#spring.cloud.stream.defaultBinder: kafka

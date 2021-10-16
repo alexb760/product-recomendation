@@ -1,21 +1,4 @@
 server.port: 7002
-#spring.application.name: recommendation
-
-app:
-  eureka-username: u
-  eureka-password: p
-  eureka-server: localhost
-
-#Eureka client configuration.
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: "http://${app.eureka-username}:${app.eureka-password}@${app.eureka-server}:8761/eureka/"
-    initialInstanceInfoReplicationIntervalSeconds: 5
-    registryFetchIntervalSeconds: 5
-  instance:
-    leaseRenewalIntervalInSeconds: 5
-    leaseExpirationDurationInSeconds: 5
 
 server.error.include-message: always
 
@@ -45,25 +28,11 @@ spring.cloud.stream.rabbit.bindings.input.consumer:
 spring.cloud.stream.kafka.bindings.input.consumer:
   enableDlq: true
 
-spring.cloud.stream.kafka.binder:
-  brokers: 127.0.0.1
-  defaultBrokerPort: 9092
-
-spring.rabbitmq:
-  host: 127.0.0.1
-  port: 5672
-  username: guest
-  password: guest
-  ###
-
 logging:
   level:
     root: INFO
     com.book.microservices: DEBUG
     org.springframework.data.mongodb.core.MongoTemplate: DEBUG
-
-management.endpoint.health.show-details: "ALWAYS"
-management.endpoints.web.exposure.include: "*"
 
 ---
 config:
@@ -72,15 +41,32 @@ config:
 spring.data.mongodb.host: mongodb
 server.port: 8080
 #eureka.client.serviceUrl.defaultZone: http://eureka:8761/eureka/
-spring.rabbitmq.host: rabbitmq
-spring.cloud.stream.kafka.binder.brokers: kafka
-app.eureka-server: eureka
-# We are passing these properties directly to composer files
-#spring:
-#  cloud:
-#    stream:
-#      kafka:
-#        binder:
-#          autoAddPartitions: true
-#          minPartitionCount: 4
-#          replicationFactor: 1
+
+
+#---
+#config:
+#  activate:
+#    on-profile: streaming_partitioned
+#spring.cloud.stream.bindings.input.consumer:
+#  partitioned: true
+#  instanceCount: 2
+#
+#---
+#config:
+#  activate:
+#    on-profile: streaming_instance_0
+#spring.cloud.stream.bindings.input.consumer.instanceIndex: 0
+#
+#---
+#config:
+#  activate:
+#    on-profile: streaming_instance_1
+#spring.cloud.stream.bindings.input.consumer.instanceIndex: 1
+#
+#---
+#config:
+#  activate:
+#    on-profile: kafka
+#
+#management.health.rabbit.enabled: false
+#spring.cloud.stream.defaultBinder: kafka
