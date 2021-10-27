@@ -1,0 +1,52 @@
+---
+config:
+  activate:
+    on-profile: kafka
+management.health.rabbit.enabled: false
+spring:
+  cloud:
+    stream:
+      defaultBinder: kafka
+      bindings:
+        input:
+          consumer_partitioned: true
+          consumer_instancecount: 2
+      kafka:
+        binder:
+          autoaddpartitions: true
+          replicationfactor: 1
+          minpartitioncount: 4
+#
+#spring.cloud.stream.defaultBinder: kafka
+#spring.cloud.stream.kafka.binder.autoaddpartitions: true
+#spring.cloud.stream.kafka.binder.replicationfactor: 1
+#spring.cloud.stream.kafka.binder.minpartitioncount: 4
+#spring.cloud.stream.bindings.input.consumer_partitioned: true
+#spring.cloud.stream.bindings.input.consumer_instancecount: 2
+
+#---
+#config:
+#  activate:
+#    on-profile: streaming_partitioned
+#spring.cloud.stream.bindings.input.consumer:
+#  partitioned: true
+#  instanceCount: 2
+#
+#---
+#config:
+#  activate:
+#    on-profile: streaming_instance_0
+#spring.cloud.stream.bindings.input.consumer.instanceIndex: 0
+#
+#---
+#config:
+#  activate:
+#    on-profile: streaming_instance_1
+#spring.cloud.stream.bindings.input.consumer.instanceIndex: 1
+#
+#---
+#config:
+#  activate:
+#    on-profile: kafka
+#
+
