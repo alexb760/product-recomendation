@@ -10,8 +10,12 @@ services:
       - CONFIG_SERVER_PWD=${CONFIG_SERVER_PWD}
       - SPRING_CLOUD_STREAM_BINDINGS_INPUT_CONSUMER_INSTANCEINDEX=0
     depends_on:
-      - kafka
-      - mongodb
+      mongodb:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      gateway:
+        condition: service_healthy
 
   product-p1:
     build: services/product-service
@@ -22,8 +26,12 @@ services:
       - CONFIG_SERVER_PWD=${CONFIG_SERVER_PWD}
       - SPRING_CLOUD_STREAM_BINDINGS_INPUT_CONSUMER_INSTANCEINDEX=1
     depends_on:
-      - kafka
-      - mongodb
+      mongodb:
+        condition: service_healthy
+      kafka:
+          condition: service_started
+      gateway:
+        condition: service_healthy
 
   recommendation:
     build: services/recomendation-service
@@ -34,8 +42,12 @@ services:
       - CONFIG_SERVER_PWD=${CONFIG_SERVER_PWD}
       - SPRING_CLOUD_STREAM_BINDINGS_INPUT_CONSUMER_INSTANCEINDEX=0
     depends_on:
-      - kafka
-      - mongodb
+      mongodb:
+        condition: service_healthy
+      kafka:
+          condition: service_started
+      gateway:
+        condition: service_healthy
 
   recommendation-p1:
     build: services/recomendation-service
@@ -46,8 +58,12 @@ services:
       - CONFIG_SERVER_PWD=${CONFIG_SERVER_PWD}
       - SPRING_CLOUD_STREAM_BINDINGS_INPUT_CONSUMER_INSTANCEINDEX=1
     depends_on:
-      - kafka
-      - mongodb
+      kafka:
+        condition: service_started
+      mongodb:
+        condition: service_healthy
+      gateway:
+        condition: service_healthy
 
   review:
     build: services/review-service
@@ -62,6 +78,8 @@ services:
         condition: service_healthy
       kafka:
         condition: service_started
+      gateway:
+        condition: service_healthy
 
   review-p1:
     build: services/review-service
@@ -76,6 +94,8 @@ services:
         condition: service_healthy
       kafka:
         condition: service_started
+      gateway:
+        condition: service_healthy
 
   product-composite:
     build: services/product-composite-service
@@ -95,6 +115,8 @@ services:
     depends_on:
       kafka:
         condition: service_started
+      gateway:
+        condition: service_healthy
 
   config-server:
     container_name: config-server
@@ -112,6 +134,8 @@ services:
     volumes:
       - $PWD/config_repo:/config_repo
     build: spring-cloud/config-server
+    healthcheck:
+      test: "exit 0"
 
   # Eureka server - discovery service patter
   eureka:
@@ -122,6 +146,9 @@ services:
       - CONFIG_SERVER_USR=${CONFIG_SERVER_USR}
       - CONFIG_SERVER_PWD=${CONFIG_SERVER_PWD}
     mem_limit: 350m
+    depends_on:
+      auth-server:
+        condition: service_healthy
 
   # Since we are implementing age Service we do not need to expose this service directly.
   # now our gateway will take care of
@@ -139,6 +166,11 @@ services:
     mem_limit: 350m
     ports:
       - "8443:8443"
+    healthcheck:
+      test: "exit 0"
+    depends_on:
+      auth-server:
+        condition: service_healthy
 
   auth-server:
     container_name: auth-server
@@ -148,6 +180,11 @@ services:
       - CONFIG_SERVER_PWD=${CONFIG_SERVER_PWD}
     build: spring-cloud/authorization-server
     mem_limit: 350m
+    healthcheck:
+      test: "exit 0"
+    depends_on:
+      config-server:
+        condition: service_healthy
 
   # $ mongo
   mongodb:
@@ -156,6 +193,11 @@ services:
     ports:
       - "27017:27017"
     command: mongod --smallfiles
+    healthcheck:
+      test: "mongo --eval 'db.stats().ok'"
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   # $ mysql -uroot -h127.0.0.1 -p
   mysql:
