@@ -17,6 +17,8 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+      gateway:
+        condition: service_healthy
 
   product-p1:
     container_name: product-p1
@@ -33,6 +35,8 @@ services:
       mongodb:
         condition: service_healthy
       rabbitmq:
+        condition: service_healthy
+      gateway:
         condition: service_healthy
 
   recommendation:
@@ -51,6 +55,8 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+      gateway:
+        condition: service_healthy
 
   recommendation-p1:
     container_name: recommendation-p1
@@ -67,6 +73,8 @@ services:
       mongodb:
         condition: service_healthy
       rabbitmq:
+        condition: service_healthy
+      gateway:
         condition: service_healthy
 
   review:
@@ -85,6 +93,8 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+      gateway:
+        condition: service_healthy
 
   review-p1:
     container_name: review-p1
@@ -101,6 +111,8 @@ services:
       mysql:
         condition: service_healthy
       rabbitmq:
+        condition: service_healthy
+      gateway:
         condition: service_healthy
 
   product-composite:
@@ -122,6 +134,8 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
+      gateway:
+        condition: service_healthy
 
   config-server:
     container_name: config-server
@@ -139,6 +153,8 @@ services:
     volumes:
       - $PWD/config_repo:/config_repo
     build: spring-cloud/config-server
+    healthcheck:
+      test: "exit 0"
 
   # Eureka server - discovery service patter
   eureka:
@@ -149,6 +165,9 @@ services:
       - CONFIG_SERVER_USR=${CONFIG_SERVER_USR}
       - CONFIG_SERVER_PWD=${CONFIG_SERVER_PWD}
     mem_limit: 350m
+    depends_on:
+      auth-server:
+        condition: service_healthy
 
   # Since we are implementing age Service we do not need to expose this service directly.
   # now our gateway will take care of
@@ -166,6 +185,11 @@ services:
     mem_limit: 350m
     ports:
       - "8443:8443"
+    healthcheck:
+      test: "exit 0"
+    depends_on:
+      auth-server:
+        condition: service_healthy
 
   auth-server:
     container_name: auth-server
@@ -175,6 +199,11 @@ services:
       - CONFIG_SERVER_PWD=${CONFIG_SERVER_PWD}
     build: spring-cloud/authorization-server
     mem_limit: 350m
+    healthcheck:
+      test: "exit 0"
+    depends_on:
+      config-server:
+        condition: service_healthy
 
 
   # $ mongo
