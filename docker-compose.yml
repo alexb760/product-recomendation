@@ -21,6 +21,8 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+      gateway:
+        condition: service_healthy
 
   recommendation:
     container_name: recommendation
@@ -36,6 +38,8 @@ services:
       mongodb:
         condition: service_healthy
       rabbitmq:
+        condition: service_healthy
+      gateway:
         condition: service_healthy
 
   review:
@@ -53,6 +57,8 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+      gateway:
+        condition: service_healthy
 
   product-composite:
     container_name: product-composite
@@ -67,6 +73,8 @@ services:
       - microservices
     depends_on:
       rabbitmq:
+        condition: service_healthy
+      gateway:
         condition: service_healthy
 
   config-server:
@@ -85,6 +93,8 @@ services:
     volumes:
       - $PWD/config_repo:/config_repo
     build: spring-cloud/config-server
+    healthcheck:
+      test: "exit 0"
     networks:
       - microservices
   #    mem_limit: 350m -> docker-compose < 3.0
@@ -98,6 +108,9 @@ services:
       - CONFIG_SERVER_USR=${CONFIG_SERVER_USR}
       - CONFIG_SERVER_PWD=${CONFIG_SERVER_PWD}
     mem_limit: 350m
+    depends_on:
+      auth-server:
+        condition: service_healthy
     networks:
       - microservices
 
@@ -117,10 +130,13 @@ services:
     mem_limit: 350m
     ports:
       - "8443:8443"
+    healthcheck:
+      test: "exit 0"
+    depends_on:
+      auth-server:
+        condition: service_healthy
     networks:
       - microservices
-    depends_on:
-      - config-server
 
   auth-server:
     container_name: auth-server
@@ -130,6 +146,11 @@ services:
       - CONFIG_SERVER_PWD=${CONFIG_SERVER_PWD}
     build: spring-cloud/authorization-server
     mem_limit: 350m
+    healthcheck:
+      test: "exit 0"
+    depends_on:
+      config-server:
+        condition: service_healthy
     networks:
       - microservices
 
