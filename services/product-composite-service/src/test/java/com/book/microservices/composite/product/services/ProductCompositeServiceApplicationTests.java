@@ -1,6 +1,8 @@
 package com.book.microservices.composite.product.services;
 
 import static java.util.Collections.singletonList;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
@@ -51,7 +53,7 @@ public class ProductCompositeServiceApplicationTests {
   public void setUp() {
 
     // We go for Junit 5 instead.
-    given(compositeIntegration.getProduct(PRODUCT_ID_OK))
+    given(compositeIntegration.getProduct(eq(PRODUCT_ID_OK), anyInt(), anyInt()))
         .willReturn(Mono.just(new Product(PRODUCT_ID_OK, "name", 1, "mock-address")));
     given(compositeIntegration.getRecommendations(PRODUCT_ID_OK))
         .willReturn(Flux.fromIterable(
@@ -62,9 +64,9 @@ public class ProductCompositeServiceApplicationTests {
             singletonList(
                 new Review(PRODUCT_ID_OK, 1, "author", "subject", "content", "mock address"))));
 
-    given(compositeIntegration.getProduct(PRODUCT_ID_NOT_FOUND))
+    given(compositeIntegration.getProduct(eq(PRODUCT_ID_NOT_FOUND), anyInt(), anyInt()))
         .willThrow(new NotFoundException("NOT FOUND: " + PRODUCT_ID_NOT_FOUND));
-    given(compositeIntegration.getProduct(PRODUCT_ID_INVALID))
+    given(compositeIntegration.getProduct(eq(PRODUCT_ID_INVALID), anyInt(), anyInt()))
         .willThrow(new InvalidInputException("INVALID: " + PRODUCT_ID_INVALID));
   }
 

@@ -55,6 +55,8 @@ spring.security.oauth2.resourceserver.jwt.jwk-set-uri: http://auth-server:9999/.
 #    leaseRenewalIntervalInSeconds: 5
 #    leaseExpirationDurationInSeconds: 5
 
+#Resilence4j
+app.product-service.timeoutSec: 2
 
 # *************** Kafka and RabbitNQ ******************#
 spring.cloud.stream:

@@ -15,9 +15,12 @@ import com.book.util.exception.NotFoundException;
 import com.book.util.http.HttpErrorInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.net.URI;
+import java.time.Duration;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.Output;
@@ -28,6 +31,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -48,6 +52,7 @@ public class ProductCompositeIntegration
     private final String productServiceUrl = "http://product";
     private final String recommendationServiceUrl = "http://recommendation";
     private final String reviewServiceUrl = "http://review";
+    private final int productServiceTimeoutSec;
 
     //Event Driver declarations
     private MessageSources messageSources;
@@ -74,13 +79,15 @@ public class ProductCompositeIntegration
         WebClient.Builder webClient,
         RestTemplate restTemplate,
         ObjectMapper mapper,
-        MessageSources messageSources) {
+        MessageSources messageSources,
+        @Value("${app.product-service.timeoutSec}") int productServiceTimeoutSec) {
 
         this.restTemplate = restTemplate;
         this.mapper = mapper;
         this.messageSources = messageSources;
 
         this.webClientBuilder = webClient;
+        this.productServiceTimeoutSec = productServiceTimeoutSec;
     }
 
     @Override
@@ -116,15 +123,27 @@ public class ProductCompositeIntegration
     }
 
     @Override
-    public Mono<Product> getProduct(int productId) {
-        String url = productServiceUrl + "/product/" + productId;
-        return getWebClient()
-            .get()
-            .uri(url)
-            .retrieve()
-            .bodyToMono(Product.class)
-            .log()
-            .onErrorMap(WebClientResponseException.class, this::handleException);
+    public Mono<Product> getProduct(int productId, int delay, int faultPercent) {
+//        String url = productServiceUrl + "/product/" + productId;
+//        return getWebClient()
+//            .get()
+//            .uri(url)
+//            .retrieve()
+//            .bodyToMono(Product.class)
+//            .log()
+//            .onErrorMap(WebClientResponseException.class, this::handleException);
+        log.info("Testing new delay only as a test mode.");
+        URI url = UriComponentsBuilder
+            .fromUriString(productServiceUrl +
+                "/product/{productId}?delay={delay}&faultPercent={faultPercent}")
+            .build(productId, delay, faultPercent);
+
+        log.debug("Will call the getProduct API on URL: {}", url);
+
+        return getWebClient().get().uri(url)
+            .retrieve().bodyToMono(Product.class).log()
+            .onErrorMap(WebClientResponseException.class, ex -> handleException(ex))
+            .timeout(Duration.ofSeconds(productServiceTimeoutSec));
     }
 
     @Override

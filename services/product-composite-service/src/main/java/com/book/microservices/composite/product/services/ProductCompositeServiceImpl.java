@@ -87,7 +87,7 @@ public class ProductCompositeServiceImpl implements ProductCompositeService {
   }
 
   @Override
-  public Mono<ProductAggregate> getProduct(int productId) {
+  public Mono<ProductAggregate> getProduct(int productId, int delay, int faultPercent) {
      // --- Blocking API refer to git tag v1.0.0-cap6
 
     // --- Non-Blocking code ---//
@@ -98,7 +98,7 @@ public class ProductCompositeServiceImpl implements ProductCompositeService {
             (List<Review>) values[2],
             serviceUtil.getServiceAddress()),
 //            ReactiveSecurityContextHolder.getContext().defaultIfEmpty(nullSC),
-            integration.getProduct(productId),
+            integration.getProduct(productId, delay, faultPercent),
         integration.getRecommendations(productId).collectList(),
         integration.getReviews(productId).collectList())
         .doOnError(ex -> log.warn("getCompositeProduct failed: {}", ex.toString()))
