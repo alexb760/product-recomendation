@@ -118,6 +118,7 @@ public class ProductServiceImpl implements ProductService {
 
   private void throwErrorIfBadLuck(int faultPercent) {
     int randomThreshold = getRandomNumber(1, 100);
+    log.info("Threshold: {}", randomThreshold);
     if (faultPercent < randomThreshold) {
       log.debug("We got lucky, no error occurred, {} < {}", faultPercent, randomThreshold);
     } else {

@@ -132,7 +132,6 @@ public class ProductCompositeIntegration
 //            .bodyToMono(Product.class)
 //            .log()
 //            .onErrorMap(WebClientResponseException.class, this::handleException);
-        log.info("Testing new delay only as a test mode.");
         URI url = UriComponentsBuilder
             .fromUriString(productServiceUrl +
                 "/product/{productId}?delay={delay}&faultPercent={faultPercent}")
