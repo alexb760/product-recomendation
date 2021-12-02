@@ -14,6 +14,8 @@ import com.book.util.exception.InvalidInputException;
 import com.book.util.exception.NotFoundException;
 import com.book.util.http.HttpErrorInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import java.io.IOException;
 import java.net.URI;
 import java.time.Duration;
@@ -122,6 +124,8 @@ public class ProductCompositeIntegration
         return body;
     }
 
+    @Retry(name = "product")
+    @CircuitBreaker(name = "product")
     @Override
     public Mono<Product> getProduct(int productId, int delay, int faultPercent) {
 //        String url = productServiceUrl + "/product/" + productId;
@@ -142,6 +146,8 @@ public class ProductCompositeIntegration
         return getWebClient().get().uri(url)
             .retrieve().bodyToMono(Product.class).log()
             .onErrorMap(WebClientResponseException.class, ex -> handleException(ex))
+            //@CircuitBreaker is triggered by an exception to be able to trigger by timeout
+            // we need to add a timeout to the WebClient code to generate an exception base on timeout.
             .timeout(Duration.ofSeconds(productServiceTimeoutSec));
     }
 

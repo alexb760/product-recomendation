@@ -11,6 +11,7 @@ sourceCompatibility = '14'
 
 ext {
     springCloudVersion = springCloud_version
+    resilience4jVersion = "1.7.0"
 }
 
 repositories {
@@ -29,6 +30,8 @@ dependencies {
     implementation('org.springframework.boot:spring-boot-starter-security')
     implementation('org.springframework.security:spring-security-oauth2-resource-server')
     implementation('org.springframework.security:spring-security-oauth2-jose')
+    implementation("io.github.resilience4j:resilience4j-spring-boot2:${resilience4jVersion}")
+    implementation("io.github.resilience4j:resilience4j-reactor:${resilience4jVersion}")
 
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.0.3'
 

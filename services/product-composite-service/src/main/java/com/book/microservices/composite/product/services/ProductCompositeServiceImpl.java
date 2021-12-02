@@ -8,7 +8,9 @@ import com.book.api.composite.product.ServiceAddresses;
 import com.book.api.core.product.Product;
 import com.book.api.core.recomendation.Recommendation;
 import com.book.api.core.review.Review;
+import com.book.util.exception.NotFoundException;
 import com.book.util.http.ServiceUtil;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -98,14 +100,29 @@ public class ProductCompositeServiceImpl implements ProductCompositeService {
             (List<Review>) values[2],
             serviceUtil.getServiceAddress()),
 //            ReactiveSecurityContextHolder.getContext().defaultIfEmpty(nullSC),
-            integration.getProduct(productId, delay, faultPercent),
+            integration.getProduct(productId, delay, faultPercent)
+                .onErrorReturn(CallNotPermittedException.class, getProductFallbackValue(productId)),
         integration.getRecommendations(productId).collectList(),
         integration.getReviews(productId).collectList())
         .doOnError(ex -> log.warn("getCompositeProduct failed: {}", ex.toString()))
         .log();
   }
 
-  @Override
+  private Product getProductFallbackValue(int productId) {
+
+    log.warn("Creating a fallback product for productId = {}", productId);
+
+    if (productId == 13) {
+      String errMsg = "Product Id: " + productId + " not found in fallback cache!";
+      log.warn(errMsg);
+      throw new NotFoundException(errMsg);
+    }
+
+    return new Product(
+        productId, "Fallback product" + productId, productId, serviceUtil.getServiceAddress());
+  }
+
+    @Override
   public void deleteCompositeProduct(int productId) {
     try
     {
